@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Renewable Energy Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100">
+
+  <!-- Navbar Section -->
+<nav class="bg-white shadow-md py-1"> <!-- ลดค่า py เพื่อลดขนาด navbar -->
+  <div class="max-w-6xl mx-auto flex justify-between items-center px-6">
+    <!-- Logo -->
+    <div>
+      <img src="mainlogo.png" alt="Logo" class="h-24"> <!-- เพิ่มขนาดโลโก้ให้ใหญ่ขึ้น -->
+    </div>
+    
+    <!-- Navbar Links -->
+    <div class="space-x-6 text-lg font-semibold">
+      <a href="#home" class="text-gray-700 hover:text-blue-600 transition">Home</a>
+      <a href="aboutus.html" class="text-gray-700 hover:text-blue-600 transition">About Us</a>
+      <a href="#3d-globe" class="text-gray-700 hover:text-blue-600 transition">3D Globe</a>
+      <a href="hello.html" class="text-gray-700 hover:text-blue-600 transition">Statistics</a>
+    </div>
+  </div>
+</nav>
+
+ <!-- Overview Section -->
+ <div id="overviewSection" class="relative w-full h-screen bg-cover bg-center" style="background-image: url('Bg.png');">
+  <div class="absolute inset-0 bg-blue-200 bg-opacity-30"></div>
+  <div class="relative z-10 flex flex-col items-center justify-center h-full text-gray-800">
+    <h1 class="text-3xl md:text-4xl font-bold text-white drop-shadow mb-10">Renewable Energy Overview</h1>
+
+    <!-- Country Selection Dropdown -->
+    <select id="overviewCountrySelect" class="p-2 mb-10 rounded-lg shadow-lg bg-white border border-gray-300 text-lg text-gray-700 focus:ring-2 focus:ring-blue-400">
+    <option disabled selected>Select Country</option>
+    </select>
+
+    <div class="relative w-full max-w-6xl px-4 flex flex-col md:flex-row justify-between items-center">
+      <!-- Left Metrics -->
+      <div class="flex flex-col gap-20">
+        <div id="gdpBox" class="bg-blue-100 p-8 rounded-xl shadow text-center w-64">
+          <h2 class="font-semibold">GDP per capita</h2>
+          <p class="text-2xl font-bold" id="gdp">--</p>
+        </div>
+        <div id="co2Box" class="bg-pink-100 p-8 rounded-xl shadow text-center w-64">
+          <h2 class="font-semibold">CO2 Emissions</h2>
+          <p class="text-2xl font-bold" id="co2Emissions">--</p>
+        </div>
+        <div id="accessElectricityBox" class="bg-yellow-100 p-8 rounded-xl shadow text-center w-64">
+          <h2 class="font-semibold">Access to Electricity</h2>
+          <p class="text-2xl font-bold" id="accessElectricity">--%</p>
+        </div>
+      </div>
+
+      <!-- Center Image -->
+      <img src="Center.png" alt="Energy Planet" class="w-72 md:w-96 rounded-full shadow-xl mx-8" />
+
+      <!-- Right Pie Charts -->
+      <div class="flex flex-col gap-10">
+        <div class="bg-red-100 p-4 rounded-xl shadow text-center w-64">
+          <h2 class="font-semibold mb-2">Electricity Mix (2020)</h2>
+          <canvas id="electricityMixChart" width="200" height="200"></canvas>
+        </div>
+        <div class="bg-gray-100 p-4 rounded-xl shadow text-center w-64">
+          <h2 class="font-semibold mb-2">Access to Energy (2020)</h2>
+          <canvas id="accessEnergyChart" width="200" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Function to calculate percentage change
+  function calculatePercentageChange(currentValue, baseValue) {
+    // Prevent division by zero errors
+    if (baseValue === 0) {
+      return currentValue === 0 ? "0.00%" : "∞%";  // Handle case where both values are zero
+    }
+    
+    const change = ((currentValue - baseValue) / baseValue) * 100;
+
+    // If the percentage change is less than 0.01%, round it and show a small change value
+    if (Math.abs(change) < 0.01) {
+      return null;  // Return null if change is negligible
+    }
+
+    return change.toFixed(2) + "%";
+  }
+
+  // Fetch data from the global data JSON file
+  fetch('data/global-data-on-sustainable-energy.json')
+    .then(response => response.json())
+    .then(jsonData => {
+      const countrySelect = document.getElementById('overviewCountrySelect');
+
+      // Get a unique list of countries from the data
+      const countries = [...new Set(jsonData.map(item => item.Entity))];
+
+      // Populate the dropdown with countries
+      countries.forEach(country => {
+        const option = document.createElement('option');
+        option.value = country;
+        option.textContent = country;
+        countrySelect.appendChild(option);
+      });
+
+      // Initialize the pie charts
+      const electricityMixChart = new Chart(document.getElementById('electricityMixChart').getContext('2d'), {
+        type: 'pie',
+        data: {
+          labels: ['Fossil Fuels', 'Low Carbon Energy'],
+          datasets: [{
+            data: [0, 0],  // Default data
+            backgroundColor: ['#F87171', '#34D399']
+          }]
+        }
+      });
+
+      const accessEnergyChart = new Chart(document.getElementById('accessEnergyChart').getContext('2d'), {
+        type: 'pie',
+        data: {
+          labels: ['Access to Electricity', 'Access to Clean Cooking'],
+          datasets: [{
+            data: [0, 0],  // Default data
+            backgroundColor: ['#6366F1', '#CBD5E0']
+          }]
+        }
+      });
+
+      // Function to update the data when a country is selected
+      function updateOverviewData(country) {
+        const countryData = jsonData.find(item => item.Entity === country); // Use `find()` to ensure only one country is selected
+
+        if (countryData) {
+          // Use data that is available
+          const gdp = countryData["gdp_per_capita"] || "Data not available";
+          const co2Emissions = countryData["Value_co2_emissions_kt_by_country"] || "Data not available";
+          const accessElectricity = countryData["Access to electricity (% of population)"] || "Data not available";
+          
+          // Assuming we have 2000 data for comparison
+          const baseData2000 = jsonData.find(item => item.Entity === country && item.Year === 2000);
+
+          // Calculate percentage change since 2000 for each metric
+          const gdpChange = baseData2000 ? calculatePercentageChange(countryData["gdp_per_capita"], baseData2000["gdp_per_capita"]) : null;
+          const co2EmissionsChange = baseData2000 ? calculatePercentageChange(countryData["Value_co2_emissions_kt_by_country"], baseData2000["Value_co2_emissions_kt_by_country"]) : null;
+          const accessElectricityChange = baseData2000 ? calculatePercentageChange(countryData["Access to electricity (% of population)"], baseData2000["Access to electricity (% of population)"]) : null;
+
+          // Update the metrics with the selected country's data
+          document.getElementById("gdp").textContent = `$${gdp}`;
+          document.getElementById("co2Emissions").textContent = `${co2Emissions} MTCO2`;
+          document.getElementById("accessElectricity").textContent = `${accessElectricity}%`;
+
+          // Only update the percentage change if it's not null
+          if (gdpChange) document.getElementById("gdpPercentage").textContent = `+${gdpChange} since 2000`;
+          if (co2EmissionsChange) document.getElementById("co2EmissionsPercentage").textContent = `+${co2EmissionsChange} since 2000`;
+          if (accessElectricityChange) document.getElementById("accessElectricityPercentage").textContent = `+${accessElectricityChange} since 2000`;
+
+          // Update Pie charts
+          electricityMixChart.data.datasets[0].data = [
+            countryData["Electricity from fossil fuels (TWh)"] || 0, 
+            countryData["Electricity from renewables (TWh)"] || 0
+          ];
+          accessEnergyChart.data.datasets[0].data = [
+            countryData["Access to electricity (% of population)"] || 0, 
+            82.2 // Assuming access to clean cooking data is static for now
+          ];
+
+          // Refresh the charts
+          electricityMixChart.update();
+          accessEnergyChart.update();
+        } else {
+          alert('No data available for this country.');
+        }
+      }
+
+      countrySelect.addEventListener('change', (event) => {
+        const selectedCountry = event.target.value;
+        updateOverviewData(selectedCountry);
+      });
+
+      // Initialize the data for the first country in the list
+      if (countries.length > 0) {
+        updateOverviewData(countries[0]);
+      }
+    })
+    .catch(error => console.error('Error loading JSON data:', error));
+</script>
+
+<head>
+  <meta charset="utf-8"/>
+  <title>Split View: Full Renewable Energy Dashboard</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js">
+  function exportChartAsPNG(button) {
+    const canvas = button.parentElement.nextElementSibling;
+    const link = document.createElement('a');
+    link.download = canvas.id + ".png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  }
+  
+  function exportChartAsCSV(button) {
+    const canvas = button.parentElement.nextElementSibling;
+    const chart = charts[canvas.id];
+    const labels = chart.data.labels;
+    const rows = [ ["Year", ...chart.data.datasets.map(d => d.label)] ];
+    labels.forEach((label, i) => {
+      const row = [label];
+      chart.data.datasets.forEach(d => {
+        row.push(d.data[i] ?? "");
+      });
+      rows.push(row);
+    });
+  
+    const csv = rows.map(r => r.join(",")).join("\n");
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = canvas.id + ".csv";
+    link.click();
+  }
+  
+  
+  function exportAllData() {
+    const rows = Object.keys(jsonData[0]).join(",") + "\n" +
+      jsonData.map(row => Object.values(row).map(v => `"${v}"`).join(",")).join("\n");
+  
+    const blob = new Blob([rows], { type: 'text/csv' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "all_countries_data.csv";
+    link.click();
+  }
+  
+  function exportCurrentCountry() {
+    const selectedCountry = document.getElementById("countrySelect").value;
+    const countryData = jsonData.filter(d => d.Entity === selectedCountry);
+    const rows = Object.keys(countryData[0]).join(",") + "\n" +
+      countryData.map(row => Object.values(row).map(v => `"${v}"`).join(",")).join("\n");
+  
+    const blob = new Blob([rows], { type: 'text/csv' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = selectedCountry.replace(/ /g, "_").toLowerCase() + "_data.csv";
+    link.click();
+  }
+  
+  </script>
+  </head>
+  <body class="bg-gray-100 p-4">
+  <h1 class="text-2xl text-center font-bold text-black-700 mb-2 py-8">Renewable Energy Dashboard</h1>
+  <div class="max-w-7xl mx-auto space-y-4">
+  <div class="bg-white p-4 rounded shadow flex flex-wrap gap-4 items-center">
+  <button class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 text-sm" onclick="exportAllData()">Export All Countries (CSV)</button>
+  <button class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm" onclick="exportCurrentCountry()">Export Selected Country (Full CSV)</button>
+  </div>
+  <div class="bg-white p-3 rounded shadow mb-4">
+  <label class="block font-semibold mb-1" for="countrySelect">Select Country:</label>
+  <select class="w-full p-2 border rounded" id="countrySelect"></select>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <div class="bg-white p-3 rounded shadow">
+  <h2 class="text-lg font-semibold mb-2">Access &amp; Capacity</h2>
+  <div class="text-sm flex flex-wrap mb-2"><label class="mr-4"><input checked="" class="toggleMetric" data-group="access_capacity" type="checkbox" value="Access to electricity (% of population)"/> Access to electricity (% of population)</label>
+  <label class="mr-4"><input checked="" class="toggleMetric" data-group="access_capacity" type="checkbox" value="Access to clean fuels for cooking"/> Access to clean fuels for cooking</label>
+  <label class="mr-4"><input checked="" class="toggleMetric" data-group="access_capacity" type="checkbox" value="Renewable-electricity-generating-capacity-per-capita"/> Renewable-electricity-generating-capacity-per-capita</label></div>
+  <div class="mb-2"><button class="text-sm text-blue-600 hover:underline mr-4" onclick="exportChartAsPNG(this)">Export PNG</button><button class="text-sm text-green-600 hover:underline" onclick="exportChartAsCSV(this)">Export CSV</button></div><canvas height="150" id="access_capacity"></canvas>
+  </div>
+  <div class="bg-white p-3 rounded shadow">
+  <h2 class="text-lg font-semibold mb-2">Electricity Types</h2>
+  <div class="text-sm flex flex-wrap mb-2"><label class="mr-4"><input checked="" class="toggleMetric" data-group="electricity_types" type="checkbox" value="Electricity from renewables (TWh)"/> Electricity from renewables (TWh)</label>
+  <label class="mr-4"><input checked="" class="toggleMetric" data-group="electricity_types" type="checkbox" value="Electricity from fossil fuels (TWh)"/> Electricity from fossil fuels (TWh)</label>
+  <label class="mr-4"><input checked="" class="toggleMetric" data-group="electricity_types" type="checkbox" value="Electricity from nuclear (TWh)"/> Electricity from nuclear (TWh)</label>
+  <label class="mr-4"><input checked="" class="toggleMetric" data-group="electricity_types" type="checkbox" value="Low-carbon electricity (% electricity)"/> Low-carbon electricity (% electricity)</label></div>
+  <div class="mb-2"><button class="text-sm text-blue-600 hover:underline mr-4" onclick="exportChartAsPNG(this)">Export PNG</button><button class="text-sm text-green-600 hover:underline" onclick="exportChartAsCSV(this)">Export CSV</button></div><canvas height="150" id="electricity_types"></canvas>
+  </div>
+  <div class="bg-white p-3 rounded shadow">
+  <h2 class="text-lg font-semibold mb-2">Economy &amp; Emissions</h2>
+  <div class="text-sm flex flex-wrap mb-2"><label class="mr-4"><input checked="" class="toggleMetric" data-group="economy_emissions" type="checkbox" value="gdp_growth"/> gdp_growth</label>
+  <label class="mr-4"><input checked="" class="toggleMetric" data-group="economy_emissions" type="checkbox" value="gdp_per_capita"/> gdp_per_capita</label>
+  <label class="mr-4"><input checked="" class="toggleMetric" data-group="economy_emissions" type="checkbox" value="Financial flows to developing countries (US $)"/> Financial flows to developing countries (US $)</label>
+  <label class="mr-4"><input checked="" class="toggleMetric" data-group="economy_emissions" type="checkbox" value="Value_co2_emissions_kt_by_country"/> Value_co2_emissions_kt_by_country</label>
+  <label class="mr-4"><input checked="" class="toggleMetric" data-group="economy_emissions" type="checkbox" value="Energy intensity level of primary energy (MJ/$2017 PPP GDP)"/> Energy intensity level of primary energy (MJ/$2017 PPP GDP)</label></div>
+  <div class="mb-2"><button class="text-sm text-blue-600 hover:underline mr-4" onclick="exportChartAsPNG(this)">Export PNG</button><button class="text-sm text-green-600 hover:underline" onclick="exportChartAsCSV(this)">Export CSV</button></div><canvas height="150" id="economy_emissions"></canvas>
+  </div>
+  <div class="bg-white p-3 rounded shadow">
+  <h2 class="text-lg font-semibold mb-2">Energy Summary</h2>
+  <div class="text-sm flex flex-wrap mb-2"><label class="mr-4"><input checked="" class="toggleMetric" data-group="energy_summary" type="checkbox" value="Renewable energy share in the total final energy consumption (%)"/> Renewable energy share in the total final energy consumption (%)</label>
+  <label class="mr-4"><input checked="" class="toggleMetric" data-group="energy_summary" type="checkbox" value="Primary energy consumption per capita (kWh/person)"/> Primary energy consumption per capita (kWh/person)</label>
+  <label class="mr-4"><input checked="" class="toggleMetric" data-group="energy_summary" type="checkbox" value="Renewables (% equivalent primary energy)"/> Renewables (% equivalent primary energy)</label></div>
+  <div class="mb-2"><button class="text-sm text-blue-600 hover:underline mr-4" onclick="exportChartAsPNG(this)">Export PNG</button><button class="text-sm text-green-600 hover:underline" onclick="exportChartAsCSV(this)">Export CSV</button></div><canvas height="150" id="energy_summary"></canvas>
+  </div>
+  </div>
+  </div>
+  <script>
+  const groups = {"Access & Capacity": ["Access to electricity (% of population)", "Access to clean fuels for cooking", "Renewable-electricity-generating-capacity-per-capita"], "Electricity Types": ["Electricity from renewables (TWh)", "Electricity from fossil fuels (TWh)", "Electricity from nuclear (TWh)", "Low-carbon electricity (% electricity)"], "Economy & Emissions": ["gdp_growth", "gdp_per_capita", "Financial flows to developing countries (US $)", "Value_co2_emissions_kt_by_country", "Energy intensity level of primary energy (MJ/$2017 PPP GDP)"], "Energy Summary": ["Renewable energy share in the total final energy consumption (%)", "Primary energy consumption per capita (kWh/person)", "Renewables (% equivalent primary energy)"]};
+  let jsonData = [];
+  let charts = {};
+  
+  function loadData() {
+    fetch('./data/global-data-on-sustainable-energy.json')
+      .then(res => res.json())
+      .then(data => {
+        jsonData = data;
+        const countries = [...new Set(data.map(d => d.Entity))].sort();
+        const sel = document.getElementById("countrySelect");
+        countries.forEach(c => {
+          const opt = document.createElement("option");
+          opt.value = c;
+          opt.textContent = c;
+          sel.appendChild(opt);
+        });
+        sel.value = "Thailand";
+        sel.onchange = () => renderCharts(sel.value);
+        renderCharts("Thailand");
+      });
+  }
+  
+  function renderCharts(country) {
+    const data = jsonData.filter(d => d.Entity === country);
+    const labels = data.map(d => d.Year);
+  
+    Object.entries(groups).forEach(([group, metrics]) => {
+      const canvasId = group.replace(/ /g, "_").toLowerCase().replace(/&/g, "").replace(/__/, "_");
+      const ctx = document.getElementById(canvasId).getContext("2d");
+  
+      const datasets = metrics.map((key, i) => ({
+        label: key,
+        data: data.map(d => parseFloat(d[key]) || null),
+        borderColor: `hsl(${i * 45 % 360}, 70%, 40%)`,
+        hidden: false,
+        fill: false,
+        spanGaps: true
+      }));
+  
+      if (charts[canvasId]) charts[canvasId].destroy();
+      charts[canvasId] = new Chart(ctx, {
+        type: 'line',
+        data: { labels, datasets },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: true, position: 'bottom' }
+          },
+          interaction: { mode: 'index', intersect: false }
+        }
+      });
+    });
+  }
+  
+  document.addEventListener("change", (e) => {
+    if (e.target.classList.contains("toggleMetric")) {
+      const canvasId = e.target.dataset.group;
+      const label = e.target.value;
+      const chart = charts[canvasId];
+      const dataset = chart.data.datasets.find(d => d.label === label);
+      if (dataset) {
+        dataset.hidden = !e.target.checked;
+        chart.update();
+      }
+    }
+  });
+  
+  loadData();
+  
+  function exportChartAsPNG(button) {
+    const canvas = button.parentElement.nextElementSibling;
+    const link = document.createElement('a');
+    link.download = canvas.id + ".png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  }
+  
+  function exportChartAsCSV(button) {
+    const canvas = button.parentElement.nextElementSibling;
+    const chart = charts[canvas.id];
+    const labels = chart.data.labels;
+    const rows = [ ["Year", ...chart.data.datasets.map(d => d.label)] ];
+    labels.forEach((label, i) => {
+      const row = [label];
+      chart.data.datasets.forEach(d => {
+        row.push(d.data[i] ?? "");
+      });
+      rows.push(row);
+    });
+  
+    const csv = rows.map(r => r.join(",")).join("\n");
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = canvas.id + ".csv";
+    link.click();
+  }
+  
+  
+  function exportAllData() {
+    const rows = Object.keys(jsonData[0]).join(",") + "\n" +
+      jsonData.map(row => Object.values(row).map(v => `"${v}"`).join(",")).join("\n");
+  
+    const blob = new Blob([rows], { type: 'text/csv' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "all_countries_data.csv";
+    link.click();
+  }
+  
+  function exportCurrentCountry() {
+    const selectedCountry = document.getElementById("countrySelect").value;
+    const countryData = jsonData.filter(d => d.Entity === selectedCountry);
+    const rows = Object.keys(countryData[0]).join(",") + "\n" +
+      countryData.map(row => Object.values(row).map(v => `"${v}"`).join(",")).join("\n");
+  
+    const blob = new Blob([rows], { type: 'text/csv' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = selectedCountry.replace(/ /g, "_").toLowerCase() + "_data.csv";
+    link.click();
+  }
+  
+  
+  
+  function addCountryDropdown() {
+    const sel = document.createElement("select");
+    sel.className = "p-1 border rounded w-40 countryDropdown";
+    document.getElementById("compareBarControls").insertBefore(sel, document.getElementById("barCompareYear"));
+    fillDropdown(sel);
+  }
+  
+  function resetCompareBar() {
+    const allDropdowns = document.querySelectorAll(".countryDropdown");
+    const firstTwo = Array.from(allDropdowns).slice(0, 2);
+    document.getElementById("compareBarControls").innerHTML = '';
+    firstTwo.forEach(d => document.getElementById("compareBarControls").appendChild(d));
+    const yearInput = document.createElement("input");
+    yearInput.id = "barCompareYear";
+    yearInput.type = "number";
+    yearInput.className = "p-1 border rounded w-24";
+    yearInput.min = 2000;
+    yearInput.max = 2025;
+    yearInput.value = 2020;
+    document.getElementById("compareBarControls").appendChild(yearInput);
+  
+    const addBtn = document.createElement("button");
+    addBtn.onclick = addCountryDropdown;
+    addBtn.className = "px-2 py-1 bg-indigo-500 text-white rounded text-xs";
+    addBtn.textContent = "+ Add";
+    document.getElementById("compareBarControls").appendChild(addBtn);
+  
+    const resetBtn = document.createElement("button");
+    resetBtn.onclick = resetCompareBar;
+    resetBtn.className = "px-2 py-1 bg-gray-300 rounded text-xs";
+    resetBtn.textContent = "Reset";
+    document.getElementById("compareBarControls").appendChild(resetBtn);
+  
+    const goBtn = document.createElement("button");
+    goBtn.onclick = renderBarCompareChart;
+    goBtn.className = "px-2 py-1 bg-green-600 text-white rounded text-xs";
+    goBtn.textContent = "Compare";
+    document.getElementById("compareBarControls").appendChild(goBtn);
+  
+    fillDropdowns();
+    if (window.barChart) window.barChart.destroy();
+    document.getElementById("compareBarList").innerText = "Selected: None";
+  }
+  
+  function renderBarCompareChart() {
+    const year = parseInt(document.getElementById("barCompareYear").value);
+    const metric = "Electricity from renewables (TWh)";
+    const selects = document.querySelectorAll(".countryDropdown");
+    const countries = Array.from(selects).map(s => s.value);
+    const values = countries.map(c => {
+      const row = jsonData.find(d => d.Entity === c && d.Year === year);
+      return row ? parseFloat(row[metric]) || 0 : 0;
+    });
+  
+    const ctx = document.getElementById("barCompareChartCanvas").getContext("2d");
+    const colors = ["#2563eb", "#f59e0b", "#10b981", "#ef4444", "#6366f1", "#ec4899"];
+  
+    if (window.barChart) window.barChart.destroy();
+    window.barChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: countries,
+        datasets: [{
+          label: `${metric} in ${year}`,
+          data: values,
+          backgroundColor: colors.slice(0, countries.length)
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          title: { display: false }
+        },
+        scales: {
+          y: { ticks: { font: { size: 10 } } },
+          x: { ticks: { font: { size: 10 } } }
+        }
+      }
+    });
+  
+    document.getElementById("compareBarList").innerText = "Selected: " + countries.join(", ");
+  }
+  
+  function fillDropdown(sel) {
+    const allCountries = [...new Set(jsonData.map(d => d.Entity))].sort();
+    sel.innerHTML = '';
+    allCountries.forEach(c => {
+      const opt = document.createElement("option");
+      opt.value = c;
+      opt.textContent = c;
+      sel.appendChild(opt);
+    });
+  }
+  
+  function fillDropdowns() {
+    document.querySelectorAll(".countryDropdown").forEach(fillDropdown);
+  }
+  
+  document.addEventListener("DOMContentLoaded", fillDropdowns);
+  </script>
+   
+<!-- Compare Section: Compact Horizontal Layout -->
+<div class="bg-white p-6 rounded-xl shadow mt-6 max-w-6xl mx-auto">
+  <h2 class="text-lg font-bold text-black-700 mb-4">Compare Two Countries</h2>
+
+  <div class="flex flex-wrap items-center gap-2 text-sm mb-4">
+    <select id="compareCountry1" class="p-2 border rounded w-40"></select>
+    <select id="compareCountry2" class="p-2 border rounded w-40"></select>
+    <input type="number" id="compareYear" min="2000" max="2025" value="2020" class="p-2 border rounded w-24" />
+    <select id="compareMetric" class="p-2 border rounded w-60">
+      <option value="Electricity from renewables (TWh)">Electricity from renewables (TWh)</option>
+      <option value="gdp_per_capita">GDP per capita</option>
+      <option value="Value_co2_emissions_kt_by_country">CO2 Emissions (kt)</option>
+      <option value="Access to electricity (% of population)">Access to electricity (%)</option>
+      <option value="Access to clean fuels for cooking">Clean Cooking Access</option>
+    </select>
+    <button onclick="renderCompareBar()" class="px-4 py-1 bg-green-600 text-white rounded text-sm">Compare</button>
+  </div>
+
+  <div class="text-sm text-gray-600 mb-2" id="compareSelectionSummary">Selected: None</div>
+  <div class="w-full max-w-s mx-auto">
+    <canvas id="compareBarChart" height="400"></canvas>
+  </div>
+</div>
+
+<script>
+let compareChart;
+
+fetch('data/global-data-on-sustainable-energy.json')
+  .then(res => res.json())
+  .then(data => {
+    window.jsonData = data;
+    const countries = [...new Set(data.map(d => d.Entity))].sort();
+    const sel1 = document.getElementById("compareCountry1");
+    const sel2 = document.getElementById("compareCountry2");
+    countries.forEach(c => {
+      const opt1 = document.createElement("option");
+      const opt2 = document.createElement("option");
+      opt1.value = opt2.value = c;
+      opt1.textContent = opt2.textContent = c;
+      sel1.appendChild(opt1);
+      sel2.appendChild(opt2);
+    });
+    sel1.value = "Thailand";
+    sel2.value = "Vietnam";
+  })
+  .catch(err => {
+    alert("Failed to load data.");
+    console.error(err);
+  });
+
+function renderCompareBar() {
+  if (!window.jsonData || jsonData.length === 0) {
+    alert("Data not loaded yet.");
+    return;
+  }
+
+  const country1 = document.getElementById("compareCountry1").value;
+  const country2 = document.getElementById("compareCountry2").value;
+  const year = parseInt(document.getElementById("compareYear").value);
+  const metric = document.getElementById("compareMetric").value;
+
+  document.getElementById("compareSelectionSummary").textContent = `Selected: ${country1} vs ${country2}, ${year}, Metric: ${metric}`;
+
+  const row1 = jsonData.find(d => d.Entity === country1 && d.Year === year);
+  const row2 = jsonData.find(d => d.Entity === country2 && d.Year === year);
+
+  const value1 = row1 ? parseFloat(row1[metric]) || 0 : 0;
+  const value2 = row2 ? parseFloat(row2[metric]) || 0 : 0;
+
+  const ctx = document.getElementById("compareBarChart").getContext("2d");
+  if (compareChart) compareChart.destroy();
+  compareChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: [country1, country2],
+      datasets: [{
+        label: `${metric} (${year})`,
+        data: [value1, value2],
+        backgroundColor: ["#3b82f6", "#f59e0b"],
+        borderRadius: 6,
+        barThickness: 28
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => `${ctx.dataset.label}: ${ctx.raw}`
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            stepSize: Math.ceil(Math.max(value1, value2) / 5) || 1
+          }
+        }
+      }
+    }
+  });
+}
+</script>
+
+
+</body>
+</html>
