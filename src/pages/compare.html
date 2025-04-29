@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compare Countries - EcoSphere Renewable Energy Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <nav class="navbar">
+        <div class="logo">
+          <a href="../../index.html">
+            <img src="../assets/logo.png" alt="EcoSphere Logo">
+          </a>
+        </div>
+        <div class="nav-links">
+          <a href="../../index.html">Home</a>
+          <a href="globe.html">3D Globe</a>
+          <a href="compare.html" class="active">Compare</a>
+          <a href="statistics.html">Statistics</a>
+          <a href="about.html">About Us</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <h1 class="text-3xl font-bold mb-4">Compare Countries</h1>
+      <p class="mb-6">Compare renewable energy metrics between two countries to identify trends and patterns.</p>
+      
+      <div id="comparisonContainer" class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <!-- The CountryComparison component will be rendered here -->
+      </div>
+      
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4">About Country Comparison</h2>
+        <p class="mb-4">
+          Our country comparison tool allows you to analyze and compare renewable energy metrics between two countries.
+          This can help understand:
+        </p>
+        <ul class="list-disc pl-6 mb-4 space-y-2">
+          <li>How different countries are progressing in their renewable energy adoption</li>
+          <li>The relationship between economic development and renewable energy investment</li>
+          <li>Trends in energy production and consumption across different regions</li>
+          <li>Future projections based on historical data patterns</li>
+        </ul>
+        <p>
+          Select two countries from the dropdowns above to start comparing their renewable energy metrics.
+          You can export the charts and data for your own analysis.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-8">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="mb-4 md:mb-0">
+          <img src="../assets/logo.png" alt="EcoSphere Logo" class="h-12">
+        </div>
+        <div class="text-center md:text-right">
+          <p>&copy; 2025 EcoSphere - Renewable Energy Dashboard</p>
+          <p class="text-gray-400">Data source: Global Data on Sustainable Energy</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Include the external JavaScript file -->
+  <script type="module" src="../js/compare.js"></script>
+</body>
+</html> 

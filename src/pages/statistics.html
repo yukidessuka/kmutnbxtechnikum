@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Statistics - EcoSphere Renewable Energy Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../css/main.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <nav class="navbar">
+        <div class="logo">
+          <a href="../../index.html">
+            <img src="../assets/logo.png" alt="EcoSphere Logo">
+          </a>
+        </div>
+        <div class="nav-links">
+          <a href="../../index.html">Home</a>
+          <a href="globe.html">3D Globe</a>
+          <a href="compare.html">Compare</a>
+          <a href="statistics.html" class="active">Statistics</a>
+          <a href="about.html">About Us</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="container">
+      <h1 class="text-3xl font-bold mb-4">Global Renewable Energy Statistics</h1>
+      <p class="mb-6">Explore key statistics and trends in renewable energy adoption around the world.</p>
+      
+      <!-- Controls Section -->
+      <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+        <div class="flex flex-wrap items-center gap-4">
+          <div>
+            <label for="yearSelect" class="block text-sm font-medium text-gray-700 mb-1">Year:</label>
+            <select id="yearSelect" class="p-2 border rounded">
+              <!-- Years will be added with JavaScript -->
+            </select>
+          </div>
+          
+          <div>
+            <label for="metricSelect" class="block text-sm font-medium text-gray-700 mb-1">Metric:</label>
+            <select id="metricSelect" class="p-2 border rounded">
+              <option value="renewable">Renewable Energy (%)</option>
+              <option value="electricity">Access to Electricity (%)</option>
+              <option value="co2">CO2 Emissions (kt)</option>
+              <option value="gdp">GDP per Capita</option>
+            </select>
+          </div>
+          
+          <div>
+            <label for="viewSelect" class="block text-sm font-medium text-gray-700 mb-1">View:</label>
+            <select id="viewSelect" class="p-2 border rounded">
+              <option value="top10">Top 10 Countries</option>
+              <option value="bottom10">Bottom 10 Countries</option>
+              <option value="global">Global Average</option>
+            </select>
+          </div>
+          
+          <div class="ml-auto">
+            <button id="exportBtn" class="btn btn-outline">Export Data</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Main Chart Section -->
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 id="chartTitle" class="text-xl font-semibold mb-4">Top 10 Countries by Renewable Energy (2020)</h2>
+        <div class="h-96">
+          <canvas id="mainChart"></canvas>
+        </div>
+      </div>
+      
+      <!-- Statistics Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <!-- Trends Over Time Chart -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-xl font-semibold mb-4">Global Trends Over Time</h2>
+          <div class="h-64">
+            <canvas id="trendsChart"></canvas>
+          </div>
+        </div>
+        
+        <!-- Regional Comparison Chart -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-xl font-semibold mb-4">Regional Comparison</h2>
+          <div class="h-64">
+            <canvas id="regionsChart"></canvas>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Data Table -->
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-xl font-semibold">Data Table</h2>
+          <div class="flex gap-2">
+            <button id="exportCsvBtn" class="btn btn-outline text-sm py-1">Export CSV</button>
+            <button id="exportJsonBtn" class="btn btn-outline text-sm py-1">Export JSON</button>
+          </div>
+        </div>
+        
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Country</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Value</th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Change Since 2000</th>
+              </tr>
+            </thead>
+            <tbody id="dataTableBody" class="bg-white divide-y divide-gray-200">
+              <!-- Table rows will be added with JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-8">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="mb-4 md:mb-0">
+          <img src="../assets/logo.png" alt="EcoSphere Logo" class="h-12">
+        </div>
+        <div class="text-center md:text-right">
+          <p>&copy; 2025 EcoSphere - Renewable Energy Dashboard</p>
+          <p class="text-gray-400">Data source: Global Data on Sustainable Energy</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="../js/statistics.js"></script>
+</body>
+</html> 
