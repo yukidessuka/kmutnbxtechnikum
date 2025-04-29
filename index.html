@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoSphere - Renewable Energy Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="src/css/main.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <nav class="navbar">
+        <div class="logo">
+          <img src="src/assets/logo.png" alt="EcoSphere Logo">
+        </div>
+        <div class="nav-links">
+          <a href="index.html" class="active">Home</a>
+          <a href="src/pages/globe.html">3D Globe</a>
+          <a href="src/pages/compare.html">Compare</a>
+          <a href="src/pages/statistics.html">Statistics</a>
+          <a href="src/pages/about.html">About Us</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="relative w-full h-screen bg-cover bg-center" style="background-image: url('src/assets/hero-bg.jpg');">
+      <div class="absolute inset-0 bg-blue-900 bg-opacity-60"></div>
+      <div class="relative z-10 container mx-auto px-4 h-full flex flex-col items-center justify-center text-white">
+        <h1 class="text-4xl md:text-6xl font-bold mb-4 text-center">Global Renewable Energy Dashboard</h1>
+        <p class="text-xl md:text-2xl mb-8 text-center max-w-3xl">
+          Explore 20 years of renewable energy data from countries around the world.
+          Analyze trends, compare countries, and visualize the global transition to sustainable energy.
+        </p>
+        <div class="flex flex-col md:flex-row gap-4">
+          <a href="src/pages/globe.html" class="btn btn-primary px-8 py-3 text-lg">Explore 3D Globe</a>
+          <a href="src/pages/statistics.html" class="btn btn-outline px-8 py-3 text-lg">View Statistics</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="bg-white py-16">
+      <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center mb-12">Explore Our Features</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <!-- Feature 1 -->
+          <div class="bg-blue-50 rounded-lg p-6 shadow-md">
+            <div class="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-center mb-2">Interactive 3D Globe</h3>
+            <p class="text-gray-600 text-center">
+              Explore renewable energy data on our interactive 3D globe. Click on any country to see detailed information.
+            </p>
+          </div>
+          
+          <!-- Feature 2 -->
+          <div class="bg-green-50 rounded-lg p-6 shadow-md">
+            <div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-center mb-2">Compare Countries</h3>
+            <p class="text-gray-600 text-center">
+              Select two countries to compare their renewable energy metrics side by side and identify trends.
+            </p>
+          </div>
+          
+          <!-- Feature 3 -->
+          <div class="bg-purple-50 rounded-lg p-6 shadow-md">
+            <div class="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-center mb-2">Future Predictions</h3>
+            <p class="text-gray-600 text-center">
+              Use our predictive models to see projected renewable energy adoption through 2050 based on historical trends.
+            </p>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+          <!-- Feature 4 -->
+          <div class="bg-yellow-50 rounded-lg p-6 shadow-md">
+            <div class="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-center mb-2">Interactive Timeline</h3>
+            <p class="text-gray-600 text-center">
+              Explore how renewable energy adoption has changed over time with our interactive timeline visualization.
+            </p>
+          </div>
+          
+          <!-- Feature 5 -->
+          <div class="bg-red-50 rounded-lg p-6 shadow-md">
+            <div class="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+            </div>
+            <h3 class="text-xl font-semibold text-center mb-2">Export Data</h3>
+            <p class="text-gray-600 text-center">
+              Download charts and raw data in multiple formats for your own analysis or presentations.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Preview Section -->
+    <section class="bg-blue-900 text-white py-16">
+      <div class="container mx-auto px-4">
+        <h2 class="text-3xl font-bold text-center mb-12">Global Renewable Energy Insights</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <!-- Stat 1 -->
+          <div class="bg-blue-800 rounded-lg p-6 shadow-md">
+            <h3 class="text-4xl font-bold text-center mb-2">30%</h3>
+            <p class="text-center text-blue-200">Global electricity generated from renewable sources in 2023</p>
+          </div>
+          
+          <!-- Stat 2 -->
+          <div class="bg-blue-800 rounded-lg p-6 shadow-md">
+            <h3 class="text-4xl font-bold text-center mb-2">91%</h3>
+            <p class="text-center text-blue-200">Global population with access to electricity as of 2022</p>
+          </div>
+          
+          <!-- Stat 3 -->
+          <div class="bg-blue-800 rounded-lg p-6 shadow-md">
+            <h3 class="text-4xl font-bold text-center mb-2">15.1%</h3>
+            <p class="text-center text-blue-200">Annual growth rate of global renewable capacity in 2024</p>
+          </div>
+          
+          <!-- Stat 4 -->
+          <div class="bg-blue-800 rounded-lg p-6 shadow-md">
+            <h3 class="text-4xl font-bold text-center mb-2">7%</h3>
+            <p class="text-center text-blue-200">Share of global energy production from renewable sources</p>
+          </div>
+        </div>
+        
+        <div class="text-center mt-12">
+          <a href="src/pages/statistics.html" class="btn btn-outline px-8 py-3 text-lg">Explore All Statistics</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="bg-white py-16">
+      <div class="container mx-auto px-4 text-center">
+        <h2 class="text-3xl font-bold mb-4">Ready to explore renewable energy data?</h2>
+        <p class="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+          Dive into our interactive visualizations and discover insights about sustainable energy production around the world.
+        </p>
+        <a href="src/pages/globe.html" class="btn btn-primary px-8 py-3 text-lg">Get Started Now</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-8">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="mb-4 md:mb-0">
+          <img src="src/assets/logo.png" alt="EcoSphere Logo" class="h-12">
+        </div>
+        <div class="text-center md:text-right">
+          <p>&copy; 2025 EcoSphere - Renewable Energy Dashboard</p>
+          <p class="text-gray-400">Data source: Global Data on Sustainable Energy</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="src/js/main.js"></script>
+</body>
+</html> 
