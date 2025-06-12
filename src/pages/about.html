@@ -1,1 +1,777 @@
-empty page
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ecosphere</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron&family=Quicksand&display=swap');
+
+  * {
+    margin: 0; padding: 0; box-sizing: border-box;
+  }
+  body {
+    font-family: 'Quicksand', sans-serif;
+    background-color: #e7f1f6;
+    color: #1b1b1b;
+    line-height: 1.7;
+    min-height: auto;
+  }
+  nav {
+    width: auto;
+    height: 112px;
+    background-color: #202a3a;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 40px;
+    position: relative;
+  }
+  nav .logo {
+    position: absolute;
+    left: 40px;
+    top: 6px;
+    width: 100px;
+    height: 100px;
+  }
+  nav .logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  nav a {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    color: #c9c9c9;
+    text-decoration: none;
+    margin-left: 48px;
+    transition: color 0.3s ease;
+  }
+  nav a.active,
+  nav a:hover {
+    color: white;
+    font-weight: 700;
+  }
+
+  .header-section {
+    width: auto;
+    height: 1038px;
+    background: url('../assets/pic2.png') no-repeat center center/cover;
+    display: flex;
+    padding: 120px 160px 0 160px;
+    color: white;
+    position: relative;
+  }
+  .header-left {
+    width: 460px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+  .header-left small {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 14px;
+    color: #7f8fa4;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    margin-bottom: 24px;
+  }
+  .header-left h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 38px;
+    line-height: 1.2;
+    margin-bottom: 80px;
+  }
+
+  .year-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+  }
+
+  .year-card {
+    width: 365px;
+    height: 501px;
+    background: white;
+    border-radius: 15px;
+    box-shadow:
+      0 15px 30px rgba(0,0,0,0.2),
+      inset 0 0 70px rgba(255,255,255,0.7);
+    padding: 28px 24px 28px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    user-select: none;
+  }
+  .year-card .year-text {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 24px;
+    color: #27579e;
+    margin-bottom: 8px;
+  }
+  .year-card .year-subtext {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 400;
+    font-size: 13px;
+    color: #353d4a;
+    margin-bottom: 16px;
+  }
+  .year-card img {
+    width: 320px;
+    height: 320px;
+    border-radius: 30px;
+    object-fit: cover;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+  }
+
+.info-container {
+  width: 933px;
+  height: 165px;
+  flex-shrink: 0;
+  align-self: flex-end;
+}
+
+.header-right {
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  font-family: 'Orbitron', sans-serif;
+  position: absolute;
+  right: 160px;
+  top: 160px;
+  width: 420px;
+}
+.header-right strong {
+  font-size: 1.4rem;
+  margin-bottom: 16px;
+}
+.header-right p {
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.8;
+  margin-bottom: 48px;
+  color: white;
+}
+.btn-mission {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: white;
+  background-color: #202a3a;
+  border: none;
+  border-radius: 30px;
+  padding: 14px 28px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  user-select: none;
+}
+.btn-mission:hover {
+  background-color: #354165;
+}
+.btn-icon-wrapper {
+  width: 28px;
+  height: 28px;
+  background: black;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.btn-icon-wrapper svg {
+  width: 16px;
+  height: 16px;
+  fill: white;
+}
+
+/* Section About Us */
+.about-section {
+  display: flex;
+  gap: 60px;
+  padding: 80px 160px;
+  max-width: 1920px;
+  margin: 0 auto;
+  font-family: 'Quicksand', sans-serif;
+  align-items: flex-start;
+  position: relative;
+}
+.about-left img {
+  width: 482px;
+  height: 702px;
+  border-radius: 40px;
+  object-fit: cover;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+.about-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* ทำให้เนื้อหาในนี้อยู่กลางแนวตั้ง */
+}
+.about-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 12px; /* ลดลงมาเล็กน้อยเพื่อให้ปุ่ม view details ชิดหัวข้อ */
+}
+.about-header h2 {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 28px;
+  color: #1b1b1b;
+}
+.view-details {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: #2460f0;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  margin-top: 8px; /* เว้นระยะห่างจากหัวข้อ */
+}
+.view-details .arrow {
+  font-size: 20px;
+}
+.about-content {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+}
+.about-image-wrapper {
+  position: relative;
+  width: 396px;
+  height: 553px;
+  border-radius: 40px;
+  overflow: visible;  /* ต้องเป็น visible เพื่อให้กล่อง overlay โผล่ออกมา */
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+.about-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 40px;
+}
+.about-overlay {
+  position: absolute;
+  bottom: 20px;
+  left: -220px; /* เลื่อนให้ชิดภาพใหญ่ซ้าย */
+  width: 266px;
+  height: 271px;
+  background-color: rgba(43, 57, 81, 0.85);
+  color: white;
+  border-radius: 20px;
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  user-select: none;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+  text-align: center;
+}
+.about-overlay img {
+  width: 87px;
+  height: 87px;
+  object-fit: contain;
+}
+.about-content p {
+  flex: 1;
+  max-width: 500px;
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 400;
+  font-size: 20px;        /* เพิ่มขนาดข้อความ */
+  line-height: 1.6;       /* ลดลงมาให้พอดีตามภาพ */
+  color: #333333;         /* ใช้สีเทาเข้ม */
+  margin-top: 100px; /* เลื่อนลงมา 30px */
+  padding: 0;
+  margin-left: 40px;
+}
+.solution-section {
+  max-width: 1920px;
+  display: flex;
+  padding: 80px 160px;
+  gap: 80px;
+  margin: 0 auto;
+  align-items: flex-start;
+  background-color: #f8fbfd; /* สีฟ้าอ่อน */
+  font-family: 'Quicksand', sans-serif;
+  margin-top: -100px;
+}
+
+.solution-left {
+  flex: 1;
+  max-width: 600px;
+
+}
+
+.solution-left small {
+  font-family: 'Orbitron', sans-serif;
+  color: #2460f0;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  font-size: 14px;
+  border-bottom: 2px solid #2460f0;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+.solution-left h2 {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 30px;
+  color: #1b1b1b;
+  line-height: 1.6;
+  margin-bottom: 50px;
+}
+
+.solution-left p {
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: #6c7a96;
+  line-height: 1.7;
+  max-width: 400px;
+}
+
+.solution-right img {
+  max-width: 885px;
+  max-height: 699px;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  display: block;
+  position: relative;
+  z-index: 1;
+}
+
+
+.solution-section, .solution-right, .solution-right img {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+.team-section {
+  max-width: 1920px;
+  margin: 80px auto;
+  display: flex;
+  gap: 130px;
+  padding: 0 160px;
+  font-family: 'Quicksand', sans-serif;
+  align-items: center;
+  margin-top: -80px;
+}
+
+.team-left {
+  position: relative;
+  flex: 1;
+  max-width: 650px;
+}
+
+.team-left img {
+  width: 600px;
+  height: 802px;
+  border-radius: 20px;
+  object-fit: cover;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  display: block;
+}
+
+.team-logos {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background: linear-gradient(135deg, #2a3b58, #16243f);
+  border-radius: 20px;
+  padding: 24px 32px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 320px;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.logo-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo-card img {
+  width: 80px;
+  height: auto;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.team-right {
+  flex: 1;
+  max-width: 600px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  padding: 48px 60px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+  font-weight: 400;
+  color: #4a5868;
+}
+
+.team-right h3 {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 32px;
+  margin-bottom: 24px;
+  color: #1b1b1b;
+}
+
+.team-right p {
+  line-height: 1.7;
+  margin-bottom: 40px;
+  font-size: 16px;
+}
+
+.btn-question {
+  font-family: 'Orbitron', sans-serif;
+  background-color: #2460f0;
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 14px 32px;
+  border: none;
+  border-radius: 28px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  user-select: none;
+  box-shadow: 0 6px 20px rgba(36, 96, 240, 0.4);
+  transition: background-color 0.3s ease;
+}
+
+.btn-question:hover {
+  background-color: #1b4bca;
+}
+
+.btn-arrow {
+  font-size: 20px;
+  line-height: 1;
+}
+.members-section {
+  max-width: 1920px;
+  margin: 80px auto 120px;
+  padding: 0 160px;
+  font-family: 'Quicksand', sans-serif;
+  color: #1b1b1b;
+}
+
+.members-header small {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: #2460f0;
+  letter-spacing: 1.5px;
+  border-bottom: 2px solid #2460f0;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+.members-header h2 {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 32px;
+  margin-bottom: 48px;
+  line-height: 1.2;
+}
+
+.members-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px 48px;
+}
+
+.member-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.member-card img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+}
+
+.member-info {
+  padding: 24px 20px;
+  flex: 1;
+}
+
+.member-info h4 {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  color: #2460f0;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.member-info h3 {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 12px;
+  color: #1b1b1b;
+}
+
+.member-info p {
+  font-weight: 400;
+  font-size: 14px;
+  color: #6c7a96;
+  line-height: 1.6;
+}
+.footer {
+  background-color: #1e2739; /* สีพื้นหลังเข้ม */
+  height: 404px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Quicksand', sans-serif;
+  color: #c9c9c9;
+}
+
+.footer-container {
+  max-width: 1920px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 160px;
+}
+
+.footer-left img {
+  height: 100px; /* ปรับขนาดโลโก้ตามต้องการ */
+  width: 100px;
+  object-fit: contain;
+}
+
+.footer-right p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: right;
+  font-weight: 400;
+}
+
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">
+    <img src="../assets/logo.png" alt="Ecosphere Logo" />
+  </div>
+  <a href="index.html">Home</a>
+  <a href="about.html" class="active">About us</a>
+  <a href="globe.html">3D-Globe</a>
+  <a href="statistics.html">Statistics</a>
+</nav>
+
+
+  <section class="header-section">
+    <div class="header-left">
+      <small>ABOUT ECOSPHERE</small>
+      <h1>
+        Visualizing Sustainable<br />
+        Energy for a Greener<br />
+        Tomorrow
+      </h1>
+
+      <div class="year-container">
+        <div class="year-card" aria-label="Year Card with image and text">
+          <div class="year-text">20+ Years</div>
+          <div class="year-subtext">Global Renewable Energy Data</div>
+          <img src="../assets/pic3.png" alt="Solar Panel" />
+        </div>
+
+        <div class="info-container" aria-label="Info container next to year card">
+          <img src="../assets/Container.png" alt="Container Image" />
+        </div>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <strong>Ecosphere is an interactive platform</strong>
+      <p>
+        that uses 20 years of global renewable energy data to help users explore,
+        analyze, and compare sustainable energy trends worldwide. Our mission is to
+        provide clear insights that support informed decisions for a greener future.
+      </p>
+<button class="btn-mission" aria-label="Explore Our Mission" style="width: 229px; height: 57px; padding: 0 20px; border-radius: 28.5px; display: flex; align-items: center; gap: 10px;">
+  <img src="../assets/icon.png" alt="Icon Globe Check" style="width: 24px; height: 24px;" />
+  <span style="font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 14px; color: white;">
+    Explore Our Mission
+  </span>
+</button>
+    </div>
+  </section>
+
+  <section class="about-section">
+    <div class="about-left">
+      <img src="../assets/pic4.png" alt="Windmill" />
+    </div>
+    <div class="about-right">
+      <div class="about-header">
+        <h2>About us description</h2>
+        <a href="#" class="view-details" aria-label="View Details">
+          View Details
+          <span class="arrow">→</span>
+        </a>
+      </div>
+      <div class="about-content">
+        <div class="about-image-wrapper">
+          <img src="../assets/pic5.png" alt="Ice Wind" />
+          <div class="about-overlay">
+            <img src="../assets/water icon.png" alt="Clean Energy Icon" />
+            <span>Clean Energy</span>
+          </div>
+        </div>
+        <p>
+          We are a passionate team dedicated to making global
+          energy data accessible, understandable, and impactful.
+          Our mission is to empower researchers, policymakers,
+          and the public with reliable insights into renewable
+          energy, energy access, and carbon emissions. By 
+          visualizing data from over 200 countries across two 
+          decades, we aim to drive awareness, inform decisions, 
+          and inspire actions toward a more sustainable and 
+          inclusive energy future.
+        </p>
+      </div>
+    </div>
+  </section>
+<section class="solution-section">
+  <div class="solution-left">
+    <small>OUR SOLUTION</small>
+    <h2>
+      We offer an interactive platform that visualizes 20 years of renewable energy data from over 200 countries.
+    </h2>
+    <p>
+      Users can explore trends by country and compare two countries side by side, making global energy insights easy to understand and use for sustainable decisions.
+    </p>
+  </div>
+  <div class="solution-right">
+    <img src="../assets/pic11.png" alt="Factory Image" />
+  </div>
+  </div>
+</section>
+<section class="team-section">
+  <div class="team-left">
+    <img src="../assets/pic6.png" alt="Windmill" />
+    <div class="team-logos">
+      <div class="logo-card">
+        <img src="../assets/tec.png" alt="University of Applied Sciences Technikum Wien" />
+        <p>University of Applied Sciences Technikum Wien</p>
+      </div>
+      <div class="logo-card">
+        <img src="../assets/kmutnb.png" alt="King Mongkut's University Of Technology North Bangkok" />
+        <p>King Mongkut's University Of Technology North Bangkok</p>
+      </div>
+    </div>
+  </div>
+  <div class="team-right">
+    <h3>The team</h3>
+    <p>
+      This project is a collaboration between undergraduate students from University of Applied Sciences Technikum Wien and King Mongkut's University of Technology North Bangkok. Together, they develop a Java-based platform that visualizes 20 years of global renewable energy data. The team combines skills from both universities to create an interactive tool for exploring and comparing sustainable energy trends worldwide.
+    </p>
+
+  </div>
+</section>
+<section class="members-section">
+  <div class="members-header">
+    <small>OUR TEAM</small>
+    <h2>Meet our member</h2>
+  </div>
+  <div class="members-grid">
+    <div class="member-card">
+      <img src="../assets/yuki.png" alt="Onwara Poonsupasin" />
+      <div class="member-info">
+        <h4>ONWARA POONSUPASIN</h4>
+        <h3>Project Management & Web Developer</h3>
+        <p>
+          Onwara coordinates with the team and KMUTNB stakeholders, and develops user-friendly, data-integrated websites.
+        </p>
+      </div>
+    </div>
+
+    <div class="member-card">
+      <img src="../assets/crepe.png" alt="Jirapinya Boonmeprasert" />
+      <div class="member-info">
+        <h4>JIRAPINYA BOONMEPRASERT</h4>
+        <h3>UX/UI Designer & Frontend Developer</h3>
+        <p>
+          Jirapinya designs the Home page layout in Figma, and as a Frontend Developer, implements it into a responsive, user-friendly website balancing usability and aesthetics.
+        </p>
+      </div>
+    </div>
+
+    <div class="member-card">
+      <img src="../assets/nadia.png" alt="Kanokros Sopitanont" />
+      <div class="member-info">
+        <h4>KANOKROS SOPITANONT</h4>
+        <h3>UX/UI Design & Web Designer</h3>
+        <p>
+          Kanokros designed and developed intuitive, interactive data visualization pages using modern front-end technologies.
+        </p>
+      </div>
+    </div>
+
+    <div class="member-card">
+      <img src="../assets/perch.png" alt="Perch Boonwanich" />
+      <div class="member-info">
+        <h4>PERCH BOONWANICH</h4>
+        <h3>Data Visualization & Geospatial Data Analyst</h3>
+        <p>
+          Perch is responsible for exploring and managing backend operations, including Cesium and various data, to ensure they function correctly according to the planned features.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-left">
+      <img src="../assets/logo.png" alt="Ecosphere Logo" />
+    </div>
+    <div class="footer-right">
+      <p>© 2025 EcoSphere - Renewable Energy Dashboard</p>
+      <p>Data source: Global Data on Sustainable Energy</p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
