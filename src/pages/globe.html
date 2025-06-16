@@ -6,24 +6,117 @@
   <title>3D Globe - EcoSphere</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
   <link href="https://cesium.com/downloads/cesiumjs/releases/1.127/Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background-color: #f8f9fa;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      height: 60px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 15px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      padding: 5px 10px;
+    }
+
+    .nav-links a.active {
+      color: #007bff;
+    }
+
+    #cesiumContainer {
+      position: absolute;
+      top: 60px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+      background-color: #fff;
+      margin: 15% auto;
+      padding: 20px;
+      border-radius: 10px;
+      width: 50%;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      font-family: 'Quicksand', sans-serif;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  </style>
 </head>
-<body class="m-0 p-0 h-full w-full overflow-hidden">
-<nav class="flex justify-between items-center px-5 py-2.5 bg-gray-100 fixed top-0 left-0 right-0 z-50 h-15 shadow-sm">
+<body>
+<nav class="navbar">
   <div class="logo">
     <a href="../../index.html">
-      <img src="../assets/logo.png" alt="EcoSphere Logo" class="h-10" />
+      <img src="../assets/logo.png" alt="EcoSphere Logo" style="height: 40px;" />
     </a>
   </div>
-  <div class="flex gap-4">
-    <a href="../../index.html" class="no-underline text-gray-800 font-medium px-2.5 py-1.5 hover:text-blue-600">Home</a>
-    <a href="globe.html" class="no-underline text-gray-800 font-medium px-2.5 py-1.5 hover:text-blue-600 text-blue-600">3D Globe</a>
-    <a href="compare.html" class="no-underline text-gray-800 font-medium px-2.5 py-1.5 hover:text-blue-600">Compare</a>
-    <a href="statistics.html" class="no-underline text-gray-800 font-medium px-2.5 py-1.5 hover:text-blue-600">Statistics</a>
-    <a href="about.html" class="no-underline text-gray-800 font-medium px-2.5 py-1.5 hover:text-blue-600">About Us</a>
+  <div class="nav-links">
+    <a href="../../index.html">Home</a>
+    <a href="globe.html" class="active">3D Globe</a>
+    <a href="compare.html">Compare</a>
+    <a href="statistics.html">Statistics</a>
+    <a href="about.html">About Us</a>
   </div>
 </nav>
 
-<div id="cesiumContainer" class="absolute top-15 left-0 right-0 bottom-0"></div>
+<div id="cesiumContainer"></div>
+
+<div id="countryModal" class="modal">
+  <div class="modal-content">
+    <span id="closeModal" class="close">&times;</span>
+    <h2 id="countryName">Country Name</h2>
+    <p id="countryStats">Country statistics will appear here.</p>
+  </div>
+</div>
 
 <script type="module" src="../js/globe.js"></script>
 </body>
