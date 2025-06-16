@@ -7,10 +7,10 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
+<body class="bg-gray-50 flex flex-col min-h-screen">
   <!-- Header -->
   <header>
-    <nav class="flex justify-between items-center px-5 py-2.5 bg-gray-100 z-50 h-15 shadow-sm">
+    <nav class="flex justify-between items-center px-5 py-2.5 bg-white z-50 h-15 shadow-sm">
       <div class="logo">
         <a href="../../index.html">
           <img src="../assets/logo.png" alt="EcoSphere Logo" class="h-10">
@@ -26,31 +26,54 @@
     </nav>
   </header>
 
-  <main class="main-content">
-    <div class="container">
+  <main class="container mx-auto p-6 flex-grow">
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
       <h1 class="text-3xl font-bold mb-4">Compare Countries</h1>
-      <p class="mb-6">Compare renewable energy metrics between two countries to identify trends and patterns.</p>
+      <p class="mb-6 text-gray-600">Select two countries to compare their renewable energy metrics, CO₂ emissions, and other key indicators over time.</p>
       
-      <div id="comparisonContainer" class="bg-white rounded-lg shadow-md p-6 mb-6">
-        <!-- The CountryComparison component will be rendered here -->
-      </div>
-      
-      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 class="text-xl font-semibold mb-4">About Country Comparison</h2>
-        <p class="mb-4">
-          Our country comparison tool allows you to analyze and compare renewable energy metrics between two countries.
-          This can help understand:
-        </p>
-        <ul class="list-disc pl-6 mb-4 space-y-2">
-          <li>How different countries are progressing in their renewable energy adoption</li>
-          <li>The relationship between economic development and renewable energy investment</li>
-          <li>Trends in energy production and consumption across different regions</li>
-          <li>Future projections based on historical data patterns</li>
-        </ul>
-        <p>
-          Select two countries from the dropdowns above to start comparing their renewable energy metrics.
-          You can export the charts and data for your own analysis.
-        </p>
+      <div id="comparisonContainer">
+        <!-- Country Selectors -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div>
+                <label for="countrySelect1" class="block text-sm font-medium text-gray-700">Select Country 1</label>
+                <select id="countrySelect1" class="mt-1 block w-full p-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    <option value="">-- Please select a country --</option>
+                </select>
+            </div>
+            <div>
+                <label for="countrySelect2" class="block text-sm font-medium text-gray-700">Select Country 2</label>
+                <select id="countrySelect2" class="mt-1 block w-full p-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    <option value="">-- Please select a country --</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Placeholder for comparison results -->
+        <div id="resultsContainer" class="mt-6 hidden">
+            <!-- Summary Stats -->
+            <h2 class="text-2xl font-bold mb-4">At a Glance (Latest Data - 2020)</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div id="country1-summary" class="bg-gray-50 p-4 rounded-lg border border-gray-200"></div>
+                <div id="country2-summary" class="bg-gray-50 p-4 rounded-lg border border-gray-200"></div>
+            </div>
+            
+            <!-- Charts -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white p-4 rounded-lg border border-gray-200">
+                    <h3 class="text-lg font-semibold mb-2 text-center">Renewable Energy Share Over Time (%)</h3>
+                    <div class="h-80"><canvas id="renewableChart"></canvas></div>
+                </div>
+                <div class="bg-white p-4 rounded-lg border border-gray-200">
+                    <h3 class="text-lg font-semibold mb-2 text-center">CO₂ Emissions Over Time (kt)</h3>
+                    <div class="h-80"><canvas id="co2Chart"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Initial state message -->
+        <div id="initialMessage" class="text-center py-10 text-gray-500">
+          <p>Please select two countries to begin the comparison.</p>
+        </div>
       </div>
     </div>
   </main>
@@ -65,12 +88,13 @@
           </a>
         </div>
         <div class="text-center md:text-right">
-          <p>&copy; 2025 EcoSphere - Renewable Energy Dashboard</p>
+          <p>© 2025 EcoSphere - Renewable Energy Dashboard</p>
           <p class="text-gray-400">Data source: Global Data on Sustainable Energy</p>
         </div>
       </div>
     </div>
   </footer>
 
+  <script type="module" src="../js/compare.js"></script>
 </body>
-</html> 
+</html>
