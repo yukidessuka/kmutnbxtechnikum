@@ -1,549 +1,282 @@
-import { getYearsInData, getTopCountriesByMetric, getGlobalAverageByYear, getRegionalAveragesByYear, getMetricChangeByCountry, getCountriesByRegion, formatNumber, exportToCSV } from '../utils/dataUtils.js';
+let allData = [];
+let chartInstances = {};
+let currentDataView = [];
 
-// Define our data metrics - these are the statistics we will show
-const metrics = {
-  renewable: {
-    key: 'Renewable energy share in the total final energy consumption (%)',
-    label: 'Renewable Energy (%)',
-    format: 'percentage',
-    color: '#48bb78'  // Green color
-  },
-  electricity: {
-    key: 'Access to electricity (% of population)',
-    label: 'Access to Electricity (%)',
-    format: 'percentage',
-    color: '#4299e1'  // Blue color
-  },
-  co2: {
-    key: 'Value_co2_emissions_kt_by_country',
-    label: 'CO2 Emissions (kt)',
-    format: 'largeNumber',
-    color: '#f56565'  // Red color
-  },
-  gdp: {
-    key: 'gdp_per_capita',
-    label: 'GDP per Capita',
-    format: 'currency',
-    color: '#f6ad55'  // Orange color
-  }
+// Metrik-Konfiguration
+const METRICS = {
+    'renewable': { 
+        key: 'Renewable energy share in the total final energy consumption (%)', 
+        label: 'Anteil Erneuerbarer Energien',
+        unit: '%'
+    },
+    'electricity': { 
+        key: 'Access to electricity (% of population)', 
+        label: 'Zugang zu Elektrizität',
+        unit: '%'
+    },
+    'co2': { 
+        key: 'Value_co2_emissions_kt_by_country', 
+        label: 'CO₂-Emissionen',
+        unit: 'kt'
+    },
+    'gdp': { 
+        key: 'gdp_per_capita', 
+        label: 'BIP pro Kopf',
+        unit: '$'
+    }
 };
 
-// This will store all world regions - we'll fill it with data later
-let regions = {};
+// DOM-Elemente
+const yearSelect = document.getElementById('yearSelect');
+const metricSelect = document.getElementById('metricSelect');
+const viewSelect = document.getElementById('viewSelect');
+const chartTitle = document.getElementById('chartTitle');
+const dataTableBody = document.getElementById('dataTableBody');
+const exportBtn = document.getElementById('exportBtn');
+const exportCsvBtn = document.getElementById('exportCsvBtn');
+const exportJsonBtn = document.getElementById('exportJsonBtn');
 
-// Variables to store our chart objects
-let mainChart = null;
-let trendsChart = null;
-let regionsChart = null;
+// Initialisiert das Dashboard durch Laden der Daten und Einrichten der Event-Listener
+async function initializeDashboard() {
+    try {
+        const response = await fetch('../data/global-data-on-sustainable-energy.json');
+        if (!response.ok) throw new Error(`HTTP-Fehler! Status: ${response.status}`);
+        allData = await response.json();
 
-// Variables to keep track of what the user has selected
-let currentYear = 2020;
-let currentMetric = 'renewable';
-let currentView = 'top10';
-let chartData = [];
-// Store the first year in the dataset for calculating changes over time
-let baselineYear = 2000;
+        // Filtert Nicht-Länder-Entitäten für die Hauptauswahl heraus
+        const excludedEntities = ['World', 'Africa', 'Asia', 'Europe', 'North America', 'South America', 'Oceania'];
+        const countryData = allData.filter(d => !excludedEntities.includes(d.Entity));
 
-// This runs when the page loads
-document.addEventListener('DOMContentLoaded', async () => {
-  try {
-    // Step 1: Load the regions data
-    regions = await getCountriesByRegion();
-    
-    // Step 2: Set up the year selector dropdown
-    await setupYearSelector();
-    
-    // Step 3: Set up event listeners for all controls
-    setupEventListeners();
-    
-    // Step 4: Create the empty charts
-    createEmptyCharts();
-    
-    // Step 5: Fill the charts with data
-    updateAllCharts();
-  } catch (error) {
-    console.error('Error starting the statistics page:', error);
-  }
-});
-
-// Sets up the year dropdown with all available years
-async function setupYearSelector() {
-  const years = await getYearsInData();
-  const yearSelect = document.getElementById('yearSelect');
-  
-  baselineYear = Math.min(...years) || 2000;
-  
-  years.sort((a, b) => b - a);
-  
-  // If 2020 is not available, use the most recent year
-  if (!years.includes(currentYear)) {
-    currentYear = years[0] || 2019;
-  }
-  
-  years.forEach(year => {
-    const option = document.createElement('option');
-    option.value = year;
-    option.textContent = year;
-    if (year === currentYear) option.selected = true;
-    yearSelect.appendChild(option);
-  });
+        populateYearSelect(countryData);
+        setupEventListeners();
+        updateDashboard();
+    } catch (error) {
+        console.error("Fehler bei der Initialisierung des Dashboards:", error);
+        chartTitle.textContent = "Fehler beim Laden der Daten. Bitte aktualisieren Sie die Seite.";
+    }
 }
 
-// Sets up all the buttons and dropdown event handlers
+// Füllt das Dropdown-Menü für die Jahresauswahl
+function populateYearSelect(data) {
+    const years = [...new Set(data.map(item => item.Year))].sort((a, b) => b - a);
+    years.forEach(year => {
+        const option = new Option(year, year);
+        yearSelect.add(option);
+    });
+    yearSelect.value = "2020"; // Standardmäßig das letzte vollständige Jahr
+}
+
+// Richtet Event-Listener für alle Steuerelemente ein
 function setupEventListeners() {
-  document.getElementById('yearSelect').addEventListener('change', (e) => {
-    currentYear = parseInt(e.target.value);
-    updateAllCharts();
-  });
-  
-  document.getElementById('metricSelect').addEventListener('change', (e) => {
-    currentMetric = e.target.value;
-    updateAllCharts();
-  });
-  
-  document.getElementById('viewSelect').addEventListener('change', (e) => {
-    currentView = e.target.value;
-    updateAllCharts();
-  });
-  
-  document.getElementById('exportCsvBtn').addEventListener('click', exportCSV);
-  document.getElementById('exportJsonBtn').addEventListener('click', exportJSON);
-  document.getElementById('exportBtn').addEventListener('click', exportChart);
+    [yearSelect, metricSelect, viewSelect].forEach(select => {
+        select.addEventListener('change', updateDashboard);
+    });
+    exportBtn.addEventListener('click', () => exportData('csv'));
+    exportCsvBtn.addEventListener('click', () => exportData('csv'));
+    exportJsonBtn.addEventListener('click', () => exportData('json'));
 }
 
-// Creates the initial empty charts
-function createEmptyCharts() {
-  createMainChart();
-  createTrendsChart();
-  createRegionsChart();
+// Hauptfunktion zur Aktualisierung aller Komponenten des Dashboards
+function updateDashboard() {
+    updateMainView();
+    updateTrendsChart();
+    updateRegionsChart();
 }
 
-// Creates the main chart (bar chart)
-function createMainChart() {
-  const mainChartCtx = document.getElementById('mainChart').getContext('2d');
-  mainChart = new Chart(mainChartCtx, {
-    type: 'bar',
-    data: {
-      labels: [],
-      datasets: [{
-        label: '',
-        data: [],
-        backgroundColor: metrics[currentMetric].color,
-        borderColor: metrics[currentMetric].color,
-        borderWidth: 1
-      }]
-    },
-    options: {
-      indexAxis: 'y',  // Makes horizontal bars
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: false
-        },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              const value = context.raw;
-              return formatNumber(value, metrics[currentMetric].format);
-            }
-          }
-        }
-      }
-    }
-  });
-}
+// Aktualisiert die Hauptansicht (Chart und Tabelle) basierend auf der Auswahl
+function updateMainView() {
+    const year = parseInt(yearSelect.value);
+    const metric = metricSelect.value;
+    const view = viewSelect.value;
+    const metricConfig = METRICS[metric];
 
-// Creates the trends chart (line chart)
-function createTrendsChart() {
-  const trendsChartCtx = document.getElementById('trendsChart').getContext('2d');
-  trendsChart = new Chart(trendsChartCtx, {
-    type: 'line',
-    data: {
-      labels: [],
-      datasets: [{
-        label: 'Global Average',
-        data: [],
-        borderColor: metrics[currentMetric].color,
-        backgroundColor: `${metrics[currentMetric].color}33`,
-        fill: true,
-        tension: 0.1
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              const value = context.raw;
-              return formatNumber(value, metrics[currentMetric].format);
-            }
-          }
-        }
-      }
-    }
-  });
-}
-
-// Creates the regions chart (radar chart)
-function createRegionsChart() {
-  const regionsChartCtx = document.getElementById('regionsChart').getContext('2d');
-  regionsChart = new Chart(regionsChartCtx, {
-    type: 'radar',
-    data: {
-      labels: Object.keys(regions),
-      datasets: [{
-        label: metrics[currentMetric].label,
-        data: Array(Object.keys(regions).length).fill(0),
-        backgroundColor: `${metrics[currentMetric].color}33`,
-        borderColor: metrics[currentMetric].color,
-        pointBackgroundColor: metrics[currentMetric].color
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      scales: {
-        r: {
-          beginAtZero: true
-        }
-      },
-      plugins: {
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              const value = context.raw;
-              return formatNumber(value, metrics[currentMetric].format);
-            }
-          }
-        }
-      }
-    }
-  });
-}
-
-// Updates all charts and the data table
-async function updateAllCharts() {
-  try {
-    updateChartTitle();
-    
-    await updateMainChart();
-    await updateTrendsChart();
-    await updateRegionsChart();
-    
-    await updateDataTable();
-  } catch (error) {
-    console.error('Error updating charts:', error);
-  }
-}
-
-// Updates the chart title based on what the user is viewing
-function updateChartTitle() {
-  const chartTitle = document.getElementById('chartTitle');
-  
-  if (currentView === 'top10') {
-    chartTitle.textContent = `Top 10 Countries by ${metrics[currentMetric].label} (${currentYear})`;
-  } else if (currentView === 'bottom10') {
-    chartTitle.textContent = `Bottom 10 Countries by ${metrics[currentMetric].label} (${currentYear})`;
-  } else {
-    chartTitle.textContent = `Global Average ${metrics[currentMetric].label} (${currentYear})`;
-  }
-}
-
-// Updates the main chart with data
-async function updateMainChart() {
-  try {
-    if (currentView === 'global') {
-      await updateGlobalMainChart();
-    } else {
-      await updateCountryRankingMainChart();
-    }
-    
-    mainChart.update();
-  } catch (error) {
-    console.error('Error updating main chart:', error);
-  }
-}
-
-// Updates the main chart for global view
-async function updateGlobalMainChart() {
-  const globalData = await getGlobalAverageByYear(metrics[currentMetric].key);
-  
-  const years = Object.keys(globalData).sort();
-  const values = years.map(year => globalData[year]);
-  
-  mainChart.data.labels = years;
-  mainChart.data.datasets[0].data = values;
-  mainChart.data.datasets[0].label = `Global Average ${metrics[currentMetric].label}`;
-  
-  mainChart.options.indexAxis = 'x';
-  mainChart.options.scales = {
-    y: {
-      beginAtZero: metrics[currentMetric].key.toLowerCase().includes('percent')
-    }
-  };
-  
-  chartData = years.map((year, index) => ({
-    year: parseInt(year),
-    value: values[index]
-  }));
-}
-
-// Updates the main chart for top10 or bottom10 view
-async function updateCountryRankingMainChart() {
-  const isAscending = currentView === 'bottom10';
-  const limit = 10;
-  
-  const countries = await getTopCountriesByMetric(
-    metrics[currentMetric].key,
-    currentYear,
-    limit,
-    !isAscending
-  );
-  
-  // Sort countries in the right order
-  if (isAscending) {
-    countries.sort((a, b) => a.value - b.value);  // Lowest to highest
-  } else {
-    countries.sort((a, b) => b.value - a.value);  // Highest to lowest
-  }
-  
-  const labels = countries.map(item => item.country);
-  const values = countries.map(item => item.value);
-  
-  mainChart.data.labels = labels;
-  mainChart.data.datasets[0].data = values;
-  mainChart.data.datasets[0].label = metrics[currentMetric].label;
-  
-  mainChart.options.indexAxis = 'y';
-  mainChart.options.scales = {
-    x: {
-      beginAtZero: metrics[currentMetric].key.toLowerCase().includes('percent')
-    }
-  };
-  
-  chartData = countries;
-}
-
-// Updates the trends chart with global average data over time
-async function updateTrendsChart() {
-  try {
-    const globalData = await getGlobalAverageByYear(metrics[currentMetric].key);
-    
-    const years = Object.keys(globalData).sort();
-    const values = years.map(year => globalData[year]);
-    
-    trendsChart.data.labels = years;
-    trendsChart.data.datasets[0].data = values;
-    trendsChart.data.datasets[0].label = `Global ${metrics[currentMetric].label}`;
-    trendsChart.data.datasets[0].borderColor = metrics[currentMetric].color;
-    trendsChart.data.datasets[0].backgroundColor = `${metrics[currentMetric].color}33`;
-    
-    trendsChart.options.scales = {
-      y: {
-        beginAtZero: metrics[currentMetric].key.toLowerCase().includes('percent')
-      }
-    };
-    
-    trendsChart.update();
-  } catch (error) {
-    console.error('Error updating trends chart:', error);
-  }
-}
-
-// Updates the regions radar chart with regional averages
-async function updateRegionsChart() {
-  try {
-    regionsChart.data.labels = Object.keys(regions);
-    
-    const regionalData = await getRegionalAveragesByYear(
-      metrics[currentMetric].key,
-      currentYear,
-      regions
+    let dataForYear = allData.filter(d => 
+        d.Year === year && 
+        d[metricConfig.key] != null && 
+        !isNaN(d[metricConfig.key]) &&
+        d.Entity.match(/^[A-Z]/) // Filter für Entitäten, die mit einem Großbuchstaben beginnen (Länder)
     );
-    
-    const regionNames = Object.keys(regions);
-    const regionValues = regionNames.map(region => regionalData[region] || 0);
-    
-    regionsChart.data.datasets[0].data = regionValues;
-    regionsChart.data.datasets[0].label = metrics[currentMetric].label;
-    regionsChart.data.datasets[0].borderColor = metrics[currentMetric].color;
-    regionsChart.data.datasets[0].backgroundColor = `${metrics[currentMetric].color}33`;
-    
-    regionsChart.update();
-  } catch (error) {
-    console.error('Error updating regions chart:', error);
-  }
-}
 
-// Updates the data table with the current chart data
-async function updateDataTable() {
-  const tableBody = document.getElementById('dataTableBody');
-  tableBody.innerHTML = '';
-  
-  if (chartData.length === 0) return;
-  
-  try {
-    if (currentView === 'global') {
-      await updateGlobalViewTable(tableBody);
-    } else {
-      await updateCountryRankingTable(tableBody);
+    let title = '';
+    
+    if (view === 'top10' || view === 'bottom10') {
+        const sortOrder = (view === 'top10') ? (a, b) => b[metricConfig.key] - a[metricConfig.key] : (a, b) => a[metricConfig.key] - b[metricConfig.key];
+        currentDataView = dataForYear.sort(sortOrder).slice(0, 10);
+        title = `${view === 'top10' ? 'Top' : 'Letzte'} 10 Länder nach ${metricConfig.label} (${year})`;
+    } else { // Globale Durchschnittsansicht
+        const globalEntry = allData.find(d => d.Entity === 'World' && d.Year === year);
+        currentDataView = globalEntry ? [globalEntry] : [];
+        title = `Globaler Durchschnitt für ${metricConfig.label} (${year})`;
     }
-  } catch (error) {
-    console.error('Error updating data table:', error);
-    createFallbackTable(tableBody);
-  }
+
+    chartTitle.textContent = title;
+    updateMainChart(currentDataView, metricConfig);
+    updateDataTable(currentDataView, metricConfig);
 }
 
-// Updates the table for global view
-async function updateGlobalViewTable(tableBody) {
-  chartData.forEach((item, index) => {
-    const row = document.createElement('tr');
-    
-    const rankCell = document.createElement('td');
-    rankCell.className = 'px-6 py-4 whitespace-nowrap';
-    rankCell.textContent = index + 1;
-    row.appendChild(rankCell);
-    
-    const yearCell = document.createElement('td');
-    yearCell.className = 'px-6 py-4 whitespace-nowrap font-medium';
-    yearCell.textContent = item.year;
-    row.appendChild(yearCell);
-    
-    const valueCell = document.createElement('td');
-    valueCell.className = 'px-6 py-4 whitespace-nowrap';
-    valueCell.textContent = formatNumber(item.value, metrics[currentMetric].format);
-    row.appendChild(valueCell);
-    
-    const changeCell = document.createElement('td');
-    changeCell.className = 'px-6 py-4 whitespace-nowrap';
-    changeCell.textContent = 'N/A';
-    row.appendChild(changeCell);
-    
-    tableBody.appendChild(row);
-  });
-}
-
-// Updates the table for country ranking views
-async function updateCountryRankingTable(tableBody) {
-  const countries = chartData.map(item => item.country);
-  
-  const changes = await getMetricChangeByCountry(
-    metrics[currentMetric].key,
-    baselineYear,
-    currentYear,
-    countries
-  );
-  
-  chartData.forEach((item, index) => {
-    const row = document.createElement('tr');
-
-    const rankCell = document.createElement('td');
-    rankCell.className = 'px-6 py-4 whitespace-nowrap';
-    rankCell.textContent = index + 1;
-    row.appendChild(rankCell);
-    
-    const countryCell = document.createElement('td');
-    countryCell.className = 'px-6 py-4 whitespace-nowrap font-medium';
-    countryCell.textContent = item.country;
-    row.appendChild(countryCell);
-    
-    const valueCell = document.createElement('td');
-    valueCell.className = 'px-6 py-4 whitespace-nowrap';
-    valueCell.textContent = formatNumber(item.value, metrics[currentMetric].format);
-    row.appendChild(valueCell);
-    
-    const changeCell = document.createElement('td');
-    changeCell.className = 'px-6 py-4 whitespace-nowrap';
-    
-    if (changes[item.country]) {
-      const change = changes[item.country].percentageChange;
-      const isPositive = change > 0;
-      
-      changeCell.textContent = `${isPositive ? '+' : ''}${change.toFixed(1)}%`;
-      changeCell.classList.add(isPositive ? 'text-green-600' : 'text-red-600');
-    } else {
-      changeCell.textContent = 'N/A';
+// Rendert oder aktualisiert das Haupt-Balkendiagramm
+function updateMainChart(data, metricConfig) {
+    if (chartInstances.mainChart) {
+        chartInstances.mainChart.destroy();
     }
-    
-    row.appendChild(changeCell);
-    
-    tableBody.appendChild(row);
-  });
+    const ctx = document.getElementById('mainChart').getContext('2d');
+    chartInstances.mainChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: data.map(d => d.Entity),
+            datasets: [{
+                label: `${metricConfig.label} (${metricConfig.unit})`,
+                data: data.map(d => d[metricConfig.key]),
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } }
+        }
+    });
 }
 
-// Creates a simple fallback table if there's an error
-function createFallbackTable(tableBody) {
-  chartData.forEach((item, index) => {
-    const row = document.createElement('tr');
-    
-    const rankCell = document.createElement('td');
-    rankCell.className = 'px-6 py-4 whitespace-nowrap';
-    rankCell.textContent = index + 1;
-    row.appendChild(rankCell);
-    
-    const nameCell = document.createElement('td');
-    nameCell.className = 'px-6 py-4 whitespace-nowrap font-medium';
-    nameCell.textContent = item.country || item.year;
-    row.appendChild(nameCell);
-    
-    const valueCell = document.createElement('td');
-    valueCell.className = 'px-6 py-4 whitespace-nowrap';
-    valueCell.textContent = formatNumber(item.value, metrics[currentMetric].format);
-    row.appendChild(valueCell);
-    
-    const changeCell = document.createElement('td');
-    changeCell.className = 'px-6 py-4 whitespace-nowrap';
-    changeCell.textContent = 'N/A';
-    row.appendChild(changeCell);
-    
-    tableBody.appendChild(row);
-  });
+// Rendert oder aktualisiert die Datentabelle
+function updateDataTable(data, metricConfig) {
+    dataTableBody.innerHTML = '';
+    data.forEach((item, index) => {
+        const startYearData = allData.find(d => d.Entity === item.Entity && d.Year === 2000);
+        const startValue = startYearData ? startYearData[metricConfig.key] : null;
+        const currentValue = item[metricConfig.key];
+        let changeHtml = '<span class="text-gray-400">N/A</span>';
+        if (startValue != null && currentValue != null) {
+            const change = currentValue - startValue;
+            const changePercent = (startValue !== 0) ? (change / startValue) * 100 : Infinity;
+            const color = change > 0 ? 'text-green-600' : 'text-red-600';
+            const icon = change > 0 ? '▲' : '▼';
+            if (change.toFixed(2) !== '0.00') {
+               changeHtml = `<span class="${color}">${icon} ${Math.abs(changePercent).toFixed(1)}%</span>`;
+            } else {
+               changeHtml = `<span>-</span>`;
+            }
+        }
+
+        const row = `
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${index + 1}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.Entity}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${parseFloat(currentValue).toLocaleString('de-DE', {maximumFractionDigits: 2})} ${metricConfig.unit}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">${changeHtml}</td>
+            </tr>
+        `;
+        dataTableBody.innerHTML += row;
+    });
 }
 
-// Exports the data as CSV file
-function exportCSV() {
-  const filename = `${metrics[currentMetric].label.replace(/\s/g, '-')}-${currentYear}.csv`;
-  let csvContent = '';
-  
-  if (currentView === 'global') {
-    csvContent = 'Year,' + metrics[currentMetric].label + '\n';
-    csvContent += chartData.map(item => `${item.year},${item.value}`).join('\n');
-  } else {
-    csvContent = 'Rank,Country,' + metrics[currentMetric].label + '\n';
-    csvContent += chartData.map((item, index) => 
-      `${index + 1},${item.country},${item.value}`
-    ).join('\n');
-  }
-  
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = filename;
-  link.click();
+// Rendert oder aktualisiert das "Trends über Zeit"-Liniendiagramm
+function updateTrendsChart() {
+    const metricConfig = METRICS[metricSelect.value];
+    const worldData = allData.filter(d => d.Entity === 'World' && d.Year >= 2000 && d.Year <= 2020);
+    
+    const years = worldData.map(d => d.Year).sort();
+    const trendValues = years.map(year => {
+        const record = worldData.find(d => d.Year === year);
+        return record ? record[metricConfig.key] : null;
+    });
+
+    if (chartInstances.trendsChart) chartInstances.trendsChart.destroy();
+    const ctx = document.getElementById('trendsChart').getContext('2d');
+    chartInstances.trendsChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: years,
+            datasets: [{
+                label: `Globaler Durchschnitt ${metricConfig.label}`,
+                data: trendValues,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                fill: true,
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } }
+        }
+    });
 }
 
-// Exports the data as JSON file
-function exportJSON() {
-  const filename = `${metrics[currentMetric].label.replace(/\s/g, '-')}-${currentYear}.json`;
-  const jsonContent = JSON.stringify(chartData, null, 2);
-  
-  const blob = new Blob([jsonContent], { type: 'application/json;charset=utf-8;' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = filename;
-  link.click();
+// Rendert oder aktualisiert das "Regionaler Vergleich"-Polardiagramm
+function updateRegionsChart() {
+    const year = parseInt(yearSelect.value);
+    const metricConfig = METRICS[metricSelect.value];
+    const regionNames = ['Africa', 'Asia', 'Europe', 'North America', 'South America', 'Oceania'];
+    
+    const regionData = regionNames.map(region => {
+        const record = allData.find(d => d.Entity === region && d.Year === year);
+        return record ? record[metricConfig.key] : 0;
+    });
+
+    if (chartInstances.regionsChart) chartInstances.regionsChart.destroy();
+    const ctx = document.getElementById('regionsChart').getContext('2d');
+    chartInstances.regionsChart = new Chart(ctx, {
+        type: 'polarArea',
+        data: {
+            labels: regionNames,
+            datasets: [{
+                label: metricConfig.label,
+                data: regionData,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.7)',
+                    'rgba(54, 162, 235, 0.7)',
+                    'rgba(255, 206, 86, 0.7)',
+                    'rgba(75, 192, 192, 0.7)',
+                    'rgba(153, 102, 255, 0.7)',
+                    'rgba(255, 159, 64, 0.7)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'right' } }
+        }
+    });
 }
 
-// Exports the main chart as PNG image
-function exportChart() {
-  const canvas = document.getElementById('mainChart');
-  const image = canvas.toDataURL('image/png');
-  
-  const link = document.createElement('a');
-  link.href = image;
-  link.download = `${metrics[currentMetric].label.replace(/\s/g, '-')}-${currentYear}.png`;
-  link.click();
-} 
+// Exportiert die aktuelle Datenansicht in eine Datei
+function exportData(format) {
+    if (currentDataView.length === 0) {
+        alert("Keine Daten zum Exportieren vorhanden.");
+        return;
+    }
+
+    const year = yearSelect.value;
+    const metric = metricSelect.value;
+    const view = viewSelect.value;
+    const filename = `${view}_${metric}_${year}`;
+
+    if (format === 'csv') {
+        const headers = Object.keys(currentDataView[0]).join(',');
+        const rows = currentDataView.map(row => Object.values(row).join(',')).join('\n');
+        const csvContent = `data:text/csv;charset=utf-8,${headers}\n${rows}`;
+        triggerDownload(csvContent, `${filename}.csv`);
+    } else if (format === 'json') {
+        const jsonContent = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(currentDataView, null, 2))}`;
+        triggerDownload(jsonContent, `${filename}.json`);
+    }
+}
+
+// Erstellt einen temporären Link und löst einen Dateidownload aus
+function triggerDownload(content, filename) {
+    const link = document.createElement('a');
+    link.setAttribute('href', content);
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// Initialisiert das Dashboard beim Laden der Seite
+document.addEventListener('DOMContentLoaded', initializeDashboard);
