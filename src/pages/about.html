@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Ecosphere</title>
+<title>Ecosphere - About Us</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Orbitron&family=Quicksand&display=swap');
 
@@ -16,42 +17,6 @@
     color: #1b1b1b;
     line-height: 1.7;
     min-height: auto;
-  }
-  nav {
-    width: auto;
-    height: 112px;
-    background-color: #202a3a;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    padding: 0 40px;
-    position: relative;
-  }
-  nav .logo {
-    position: absolute;
-    left: 40px;
-    top: 6px;
-    width: 100px;
-    height: 100px;
-  }
-  nav .logo img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-  nav a {
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 400;
-    font-size: 14px;
-    color: #c9c9c9;
-    text-decoration: none;
-    margin-left: 48px;
-    transition: color 0.3s ease;
-  }
-  nav a.active,
-  nav a:hover {
-    color: white;
-    font-weight: 700;
   }
 
   .header-section {
@@ -555,52 +520,26 @@
   color: #6c7a96;
   line-height: 1.6;
 }
-.footer {
-  background-color: #1e2739; /* สีพื้นหลังเข้ม */
-  height: 404px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: 'Quicksand', sans-serif;
-  color: #c9c9c9;
-}
-
-.footer-container {
-  max-width: 1920px;
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 160px;
-}
-
-.footer-left img {
-  height: 100px; /* ปรับขนาดโลโก้ตามต้องการ */
-  width: 100px;
-  object-fit: contain;
-}
-
-.footer-right p {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.5;
-  text-align: right;
-  font-weight: 400;
-}
-
 </style>
 </head>
 <body>
-<nav>
-  <div class="logo">
-    <img src="../assets/logo.png" alt="Ecosphere Logo" />
-  </div>
-  <a href="index.html">Home</a>
-  <a href="about.html" class="active">About us</a>
-  <a href="globe.html">3D-Globe</a>
-  <a href="statistics.html">Statistics</a>
-</nav>
-
+  <!-- Header -->
+  <header>
+    <nav class="flex justify-between items-center px-5 py-2.5 bg-gray-100 z-50 h-15 shadow-sm">
+      <div class="logo">
+        <a href="../../index.html">
+          <img src="../assets/logo.png" alt="EcoSphere Logo" class="h-10">
+        </a>
+      </div>
+      <div class="flex gap-4">
+        <a href="../../index.html" class="no-underline text-gray-800 font-medium px-2.5 py-1.5 hover:text-blue-600">Home</a>
+        <a href="globe.html" class="no-underline text-gray-800 font-medium px-2.5 py-1.5 hover:text-blue-600">3D Globe</a>
+        <a href="compare.html" class="no-underline text-gray-800 font-medium px-2.5 py-1.5 hover:text-blue-600">Compare</a>
+        <a href="statistics.html" class="no-underline text-gray-800 font-medium px-2.5 py-1.5 hover:text-blue-600">Statistics</a>
+        <a href="about.html" class="no-underline text-gray-800 font-medium px-2.5 py-1.5 hover:text-blue-600 text-blue-600">About Us</a>
+      </div>
+    </nav>
+  </header>
 
   <section class="header-section">
     <div class="header-left">
@@ -762,14 +701,18 @@
     </div>
   </div>
 </section>
-<footer class="footer">
-  <div class="footer-container">
-    <div class="footer-left">
-      <img src="../assets/logo.png" alt="Ecosphere Logo" />
-    </div>
-    <div class="footer-right">
-      <p>© 2025 EcoSphere - Renewable Energy Dashboard</p>
-      <p>Data source: Global Data on Sustainable Energy</p>
+<footer class="bg-gray-800 text-white py-8">
+  <div class="container mx-auto px-4">
+    <div class="flex flex-col md:flex-row justify-between items-center">
+      <div class="mb-4 md:mb-0">
+        <a href="../../index.html">
+          <img src="../assets/logo.png" alt="EcoSphere Logo" class="h-12">
+        </a>
+      </div>
+      <div class="text-center md:text-right">
+        <p>&copy; 2025 EcoSphere - Renewable Energy Dashboard</p>
+        <p class="text-gray-400">Data source: Global Data on Sustainable Energy</p>
+      </div>
     </div>
   </div>
 </footer>

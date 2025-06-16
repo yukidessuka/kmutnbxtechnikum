@@ -9,23 +9,21 @@
 </head>
 <body>
   <!-- Header -->
-  <header class="header">
-    <div class="container">
-      <nav class="navbar">
-        <div class="logo">
-          <a href="../../index.html">
-            <img src="../assets/logo.png" alt="EcoSphere Logo">
-          </a>
-        </div>
-        <div class="nav-links">
-          <a href="../../index.html">Home</a>
-          <a href="globe.html">3D Globe</a>
-          <a href="compare.html">Compare</a>
-          <a href="statistics.html" class="active">Statistics</a>
-          <a href="about.html">About Us</a>
-        </div>
-      </nav>
-    </div>
+  <header>
+    <nav class="flex justify-between items-center px-5 py-2.5 bg-gray-100 z-50 h-15 shadow-sm">
+      <div class="logo">
+        <a href="../../index.html">
+          <img src="../assets/logo.png" alt="EcoSphere Logo" class="h-10">
+        </a>
+      </div>
+      <div class="flex gap-4">
+        <a href="../../index.html" class="no-underline text-gray-800 font-medium px-2.5 py-1.5 hover:text-blue-600">Home</a>
+        <a href="globe.html" class="no-underline text-gray-800 font-medium px-2.5 py-1.5 hover:text-blue-600">3D Globe</a>
+        <a href="compare.html" class="no-underline text-gray-800 font-medium px-2.5 py-1.5 hover:text-blue-600">Compare</a>
+        <a href="statistics.html" class="no-underline text-gray-800 font-medium px-2.5 py-1.5 hover:text-blue-600 text-blue-600">Statistics</a>
+        <a href="about.html" class="no-underline text-gray-800 font-medium px-2.5 py-1.5 hover:text-blue-600">About Us</a>
+      </div>
+    </nav>
   </header>
 
   <main class="main-content">
@@ -129,7 +127,9 @@
     <div class="container mx-auto px-4">
       <div class="flex flex-col md:flex-row justify-between items-center">
         <div class="mb-4 md:mb-0">
-          <img src="../assets/logo.png" alt="EcoSphere Logo" class="h-12">
+          <a href="../../index.html">
+            <img src="../assets/logo.png" alt="EcoSphere Logo" class="h-12">
+          </a>
         </div>
         <div class="text-center md:text-right">
           <p>&copy; 2025 EcoSphere - Renewable Energy Dashboard</p>

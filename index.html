@@ -8,21 +8,21 @@
 </head>
 <body>
   <!-- Header -->
-  <header class="header">
-    <div class="container">
-      <nav class="navbar">
-        <div class="logo">
-          <img src="src/assets/logo.png" alt="EcoSphere Logo">
-        </div>
-        <div class="nav-links">
-          <a href="index.html" class="active">Home</a>
-          <a href="src/pages/globe.html">3D Globe</a>
-          <a href="src/pages/compare.html">Compare</a>
-          <a href="src/pages/statistics.html">Statistics</a>
-          <a href="src/pages/about.html">About Us</a>
-        </div>
-      </nav>
-    </div>
+  <header>
+    <nav class="flex justify-between items-center px-5 py-2.5 bg-gray-100 z-50 h-15 shadow-sm">
+      <div class="logo">
+        <a href="index.html">
+          <img src="src/assets/logo.png" alt="EcoSphere Logo" class="h-10">
+        </a>
+      </div>
+      <div class="flex gap-4">
+        <a href="index.html" class="no-underline text-gray-800 font-medium px-2.5 py-1.5 hover:text-blue-600 text-blue-600">Home</a>
+        <a href="src/pages/globe.html" class="no-underline text-gray-800 font-medium px-2.5 py-1.5 hover:text-blue-600">3D Globe</a>
+        <a href="src/pages/compare.html" class="no-underline text-gray-800 font-medium px-2.5 py-1.5 hover:text-blue-600">Compare</a>
+        <a href="src/pages/statistics.html" class="no-underline text-gray-800 font-medium px-2.5 py-1.5 hover:text-blue-600">Statistics</a>
+        <a href="src/pages/about.html" class="no-underline text-gray-800 font-medium px-2.5 py-1.5 hover:text-blue-600">About Us</a>
+      </div>
+    </nav>
   </header>
 
   <main>
@@ -36,8 +36,8 @@
           Analyze trends, compare countries, and visualize the global transition to sustainable energy.
         </p>
         <div class="flex flex-col md:flex-row gap-4">
-          <a href="src/pages/globe.html" class="btn btn-primary px-8 py-3 text-lg">Explore 3D Globe</a>
-          <a href="src/pages/statistics.html" class="btn btn-outline px-8 py-3 text-lg">View Statistics</a>
+          <a href="src/pages/globe.html" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 text-lg rounded-lg shadow-lg transition duration-300">Explore 3D Globe</a>
+          <a href="src/pages/statistics.html" class="border-2 border-white hover:bg-white hover:text-blue-600 text-white font-bold px-8 py-3 text-lg rounded-lg transition duration-300">View Statistics</a>
         </div>
       </div>
     </section>
@@ -150,7 +150,7 @@
         </div>
         
         <div class="text-center mt-12">
-          <a href="src/pages/statistics.html" class="btn btn-outline px-8 py-3 text-lg">Explore All Statistics</a>
+          <a href="src/pages/statistics.html" class="border-2 border-white hover:bg-white hover:text-blue-900 text-white font-bold px-8 py-3 text-lg rounded-lg transition duration-300">Explore All Statistics</a>
         </div>
       </div>
     </section>
@@ -162,7 +162,7 @@
         <p class="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
           Dive into our interactive visualizations and discover insights about sustainable energy production around the world.
         </p>
-        <a href="src/pages/globe.html" class="btn btn-primary px-8 py-3 text-lg">Get Started Now</a>
+        <a href="src/pages/globe.html" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-3 text-lg rounded-lg shadow-lg transition duration-300">Get Started Now</a>
       </div>
     </section>
   </main>
@@ -172,7 +172,9 @@
     <div class="container mx-auto px-4">
       <div class="flex flex-col md:flex-row justify-between items-center">
         <div class="mb-4 md:mb-0">
-          <img src="src/assets/logo.png" alt="EcoSphere Logo" class="h-12">
+          <a href="index.html">
+            <img src="src/assets/logo.png" alt="EcoSphere Logo" class="h-12">
+          </a>
         </div>
         <div class="text-center md:text-right">
           <p>&copy; 2025 EcoSphere - Renewable Energy Dashboard</p>
@@ -182,6 +184,5 @@
     </div>
   </footer>
 
-  <script src="src/js/main.js"></script>
 </body>
 </html> 
