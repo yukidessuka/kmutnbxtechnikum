@@ -7,10 +7,10 @@
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
+<body class="bg-gray-50 flex flex-col min-h-screen">
   <!-- Header -->
   <header>
-    <nav class="flex justify-between items-center px-5 py-2.5 bg-gray-100 z-50 h-15 shadow-sm">
+    <nav class="flex justify-between items-center px-5 py-2.5 bg-white z-50 h-15 shadow-sm">
       <div class="logo">
         <a href="../../index.html">
           <img src="../assets/logo.png" alt="EcoSphere Logo" class="h-10">
@@ -26,24 +26,23 @@
     </nav>
   </header>
 
-  <main class="main-content">
-    <div class="container">
+  <main class="flex-grow container mx-auto p-6">
       <h1 class="text-3xl font-bold mb-4">Global Renewable Energy Statistics</h1>
-      <p class="mb-6">Explore key statistics and trends in renewable energy adoption around the world.</p>
+      <p class="mb-6 text-gray-600">Explore key statistics and trends in renewable energy adoption around the world.</p>
       
       <!-- Controls Section -->
       <div class="bg-white rounded-lg shadow-md p-4 mb-6">
         <div class="flex flex-wrap items-center gap-4">
           <div>
             <label for="yearSelect" class="block text-sm font-medium text-gray-700 mb-1">Year:</label>
-            <select id="yearSelect" class="p-2 border rounded">
+            <select id="yearSelect" class="p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
               <!-- Years will be added with JavaScript -->
             </select>
           </div>
           
           <div>
             <label for="metricSelect" class="block text-sm font-medium text-gray-700 mb-1">Metric:</label>
-            <select id="metricSelect" class="p-2 border rounded">
+            <select id="metricSelect" class="p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
               <option value="renewable">Renewable Energy (%)</option>
               <option value="electricity">Access to Electricity (%)</option>
               <option value="co2">CO2 Emissions (kt)</option>
@@ -53,7 +52,7 @@
           
           <div>
             <label for="viewSelect" class="block text-sm font-medium text-gray-700 mb-1">View:</label>
-            <select id="viewSelect" class="p-2 border rounded">
+            <select id="viewSelect" class="p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
               <option value="top10">Top 10 Countries</option>
               <option value="bottom10">Bottom 10 Countries</option>
               <option value="global">Global Average</option>
@@ -61,7 +60,7 @@
           </div>
           
           <div class="ml-auto">
-            <button id="exportBtn" class="btn btn-outline">Export Data</button>
+            <button id="exportBtn" class="bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-700">Export Data</button>
           </div>
         </div>
       </div>
@@ -79,7 +78,7 @@
         <!-- Trends Over Time Chart -->
         <div class="bg-white rounded-lg shadow-md p-6">
           <h2 class="text-xl font-semibold mb-4">Global Trends Over Time</h2>
-          <div class="h-64">
+          <div class="h-80">
             <canvas id="trendsChart"></canvas>
           </div>
         </div>
@@ -87,7 +86,7 @@
         <!-- Regional Comparison Chart -->
         <div class="bg-white rounded-lg shadow-md p-6">
           <h2 class="text-xl font-semibold mb-4">Regional Comparison</h2>
-          <div class="h-64">
+          <div class="h-80">
             <canvas id="regionsChart"></canvas>
           </div>
         </div>
@@ -98,8 +97,8 @@
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-semibold">Data Table</h2>
           <div class="flex gap-2">
-            <button id="exportCsvBtn" class="btn btn-outline text-sm py-1">Export CSV</button>
-            <button id="exportJsonBtn" class="btn btn-outline text-sm py-1">Export JSON</button>
+            <button id="exportCsvBtn" class="text-sm py-1 px-3 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">Export CSV</button>
+            <button id="exportJsonBtn" class="text-sm py-1 px-3 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">Export JSON</button>
           </div>
         </div>
         
@@ -119,7 +118,6 @@
           </table>
         </div>
       </div>
-    </div>
   </main>
 
   <!-- Footer -->
@@ -132,7 +130,7 @@
           </a>
         </div>
         <div class="text-center md:text-right">
-          <p>&copy; 2025 EcoSphere - Renewable Energy Dashboard</p>
+          <p>© 2025 EcoSphere - Renewable Energy Dashboard</p>
           <p class="text-gray-400">Data source: Global Data on Sustainable Energy</p>
         </div>
       </div>
@@ -141,4 +139,4 @@
 
   <script type="module" src="../js/statistics.js"></script>
 </body>
-</html> 
+</html>
