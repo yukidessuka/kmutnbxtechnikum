@@ -176,11 +176,37 @@ function updateDataTable(data, metricConfig) {
 // Rendert oder aktualisiert das "Trends über Zeit"-Liniendiagramm
 function updateTrendsChart() {
     const metricConfig = METRICS[metricSelect.value];
-    const worldData = allData.filter(d => d.Entity === 'World' && d.Year >= 2000 && d.Year <= 2020);
     
-    const years = worldData.map(d => d.Year).sort();
+    // Versuche zuerst, weltweite Daten zu finden
+    let trendData = allData.filter(d => d.Entity === 'World' && d.Year >= 2000 && d.Year <= 2020);
+    
+    // Wenn keine Weltdaten gefunden wurden, verwende Durchschnittswerte aller Länder
+    if (trendData.length === 0) {
+        const years = [...new Set(allData.filter(d => d.Year >= 2000 && d.Year <= 2020).map(d => d.Year))].sort();
+        
+        trendData = years.map(year => {
+            const countriesForYear = allData.filter(d => 
+                d.Year === year && 
+                d[metricConfig.key] != null && 
+                !isNaN(d[metricConfig.key]) && 
+                d.Entity.match(/^[A-Z]/)
+            );
+            
+            if (countriesForYear.length > 0) {
+                const avgValue = countriesForYear.reduce((sum, d) => sum + d[metricConfig.key], 0) / countriesForYear.length;
+                return {
+                    Entity: 'Global Average',
+                    Year: year,
+                    [metricConfig.key]: avgValue
+                };
+            }
+            return null;
+        }).filter(d => d !== null);
+    }
+    
+    const years = trendData.map(d => d.Year).sort((a, b) => a - b);
     const trendValues = years.map(year => {
-        const record = worldData.find(d => d.Year === year);
+        const record = trendData.find(d => d.Year === year);
         return record ? record[metricConfig.key] : null;
     });
 
@@ -202,7 +228,30 @@ function updateTrendsChart() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false } }
+            plugins: { 
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.dataset.label}: ${parseFloat(context.raw).toLocaleString('de-DE', {maximumFractionDigits: 2})} ${metricConfig.unit}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    title: {
+                        display: true,
+                        text: metricConfig.label + ' (' + metricConfig.unit + ')'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Jahr'
+                    }
+                }
+            }
         }
     });
 }
@@ -213,17 +262,70 @@ function updateRegionsChart() {
     const metricConfig = METRICS[metricSelect.value];
     const regionNames = ['Africa', 'Asia', 'Europe', 'North America', 'South America', 'Oceania'];
     
-    const regionData = regionNames.map(region => {
-        const record = allData.find(d => d.Entity === region && d.Year === year);
-        return record ? record[metricConfig.key] : 0;
-    });
+    // Prüft, ob die Regionendaten existieren
+    let hasRegionData = false;
+    for (const region of regionNames) {
+        if (allData.some(d => d.Entity === region && d.Year === year && d[metricConfig.key] != null)) {
+            hasRegionData = true;
+            break;
+        }
+    }
+    
+    // Wenn keine direkten Regionendaten existieren, gruppiere Länderdaten nach Kontinenten
+    let regionData = [];
+    let labels = [];
+    
+    if (hasRegionData) {
+        // Verwende direkte Regionendaten
+        labels = regionNames;
+        regionData = regionNames.map(region => {
+            const record = allData.find(d => d.Entity === region && d.Year === year);
+            return record && record[metricConfig.key] !== null ? record[metricConfig.key] : 0;
+        });
+    } else {
+        // Erstelle einen Regionen-Mapping-Object
+        const regionMapping = {
+            'Africa': ['Algeria', 'Angola', 'Benin', 'Botswana', 'Burkina Faso', 'Burundi', 'Cameroon', 'Central African Republic', 'Chad', 'Congo', 'Djibouti', 'Egypt', 'Equatorial Guinea', 'Eritrea', 'Ethiopia', 'Gabon', 'Gambia', 'Ghana', 'Guinea', 'Guinea-Bissau', 'Ivory Coast', 'Kenya', 'Lesotho', 'Liberia', 'Libya', 'Madagascar', 'Malawi', 'Mali', 'Mauritania', 'Mauritius', 'Morocco', 'Mozambique', 'Namibia', 'Niger', 'Nigeria', 'Rwanda', 'Senegal', 'Sierra Leone', 'Somalia', 'South Africa', 'South Sudan', 'Sudan', 'Swaziland', 'Tanzania', 'Togo', 'Tunisia', 'Uganda', 'Zambia', 'Zimbabwe'],
+            'Asia': ['Afghanistan', 'Armenia', 'Azerbaijan', 'Bahrain', 'Bangladesh', 'Bhutan', 'Brunei', 'Cambodia', 'China', 'Cyprus', 'Georgia', 'India', 'Indonesia', 'Iran', 'Iraq', 'Israel', 'Japan', 'Jordan', 'Kazakhstan', 'Kuwait', 'Kyrgyzstan', 'Laos', 'Lebanon', 'Malaysia', 'Maldives', 'Mongolia', 'Myanmar', 'Nepal', 'North Korea', 'Oman', 'Pakistan', 'Palestine', 'Philippines', 'Qatar', 'Saudi Arabia', 'Singapore', 'South Korea', 'Sri Lanka', 'Syria', 'Taiwan', 'Tajikistan', 'Thailand', 'Timor-Leste', 'Turkey', 'Turkmenistan', 'United Arab Emirates', 'Uzbekistan', 'Vietnam', 'Yemen'],
+            'Europe': ['Albania', 'Andorra', 'Austria', 'Belarus', 'Belgium', 'Bosnia and Herzegovina', 'Bulgaria', 'Croatia', 'Czech Republic', 'Denmark', 'Estonia', 'Finland', 'France', 'Germany', 'Greece', 'Hungary', 'Iceland', 'Ireland', 'Italy', 'Latvia', 'Liechtenstein', 'Lithuania', 'Luxembourg', 'Malta', 'Moldova', 'Monaco', 'Montenegro', 'Netherlands', 'North Macedonia', 'Norway', 'Poland', 'Portugal', 'Romania', 'Russia', 'San Marino', 'Serbia', 'Slovakia', 'Slovenia', 'Spain', 'Sweden', 'Switzerland', 'Ukraine', 'United Kingdom', 'Vatican City'],
+            'North America': ['Antigua and Barbuda', 'Bahamas', 'Barbados', 'Belize', 'Canada', 'Costa Rica', 'Cuba', 'Dominica', 'Dominican Republic', 'El Salvador', 'Grenada', 'Guatemala', 'Haiti', 'Honduras', 'Jamaica', 'Mexico', 'Nicaragua', 'Panama', 'Saint Kitts and Nevis', 'Saint Lucia', 'Saint Vincent and the Grenadines', 'Trinidad and Tobago', 'United States'],
+            'South America': ['Argentina', 'Bolivia', 'Brazil', 'Chile', 'Colombia', 'Ecuador', 'Guyana', 'Paraguay', 'Peru', 'Suriname', 'Uruguay', 'Venezuela'],
+            'Oceania': ['Australia', 'Fiji', 'Kiribati', 'Marshall Islands', 'Micronesia', 'Nauru', 'New Zealand', 'Palau', 'Papua New Guinea', 'Samoa', 'Solomon Islands', 'Tonga', 'Tuvalu', 'Vanuatu']
+        };
+        
+        // Aggregiere Daten nach Region
+        const regionAggregates = {};
+        const regionCounts = {};
+        
+        for (const region in regionMapping) {
+            regionAggregates[region] = 0;
+            regionCounts[region] = 0;
+        }
+        
+        // Sammle die Daten für jedes Land und aggregiere nach Region
+        allData.filter(d => d.Year === year && d[metricConfig.key] != null).forEach(d => {
+            for (const region in regionMapping) {
+                if (regionMapping[region].includes(d.Entity)) {
+                    regionAggregates[region] += d[metricConfig.key];
+                    regionCounts[region]++;
+                    break;
+                }
+            }
+        });
+        
+        // Berechne den Durchschnitt für jede Region
+        labels = Object.keys(regionAggregates);
+        regionData = labels.map(region => {
+            return regionCounts[region] > 0 ? regionAggregates[region] / regionCounts[region] : 0;
+        });
+    }
 
     if (chartInstances.regionsChart) chartInstances.regionsChart.destroy();
     const ctx = document.getElementById('regionsChart').getContext('2d');
     chartInstances.regionsChart = new Chart(ctx, {
         type: 'polarArea',
         data: {
-            labels: regionNames,
+            labels: labels,
             datasets: [{
                 label: metricConfig.label,
                 data: regionData,
@@ -240,7 +342,16 @@ function updateRegionsChart() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { position: 'right' } }
+            plugins: { 
+                legend: { position: 'right' },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.label}: ${parseFloat(context.raw).toLocaleString('de-DE', {maximumFractionDigits: 2})} ${metricConfig.unit}`;
+                        }
+                    }
+                }
+            }
         }
     });
 }
